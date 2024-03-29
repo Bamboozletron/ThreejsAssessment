@@ -28,7 +28,7 @@ export function LoadAndSplitGLTF(modelPath: string): Promise<Array<THREE.Object3
 
             model.children.forEach((o) => 
             {    
-                if ((<THREE.Mesh>o).isMesh)
+                if (o instanceof THREE.Mesh)
                 {
                     meshArray.push(o);
                 }
@@ -40,8 +40,11 @@ export function LoadAndSplitGLTF(modelPath: string): Promise<Array<THREE.Object3
         {
             reject(error);
         });        
-    });
-    
+    });    
 }
 
-
+export async function LoadGLTF(modelPath: string)
+{
+    const loader = new GLTFLoader();
+    return loader.loadAsync(modelPath);
+}

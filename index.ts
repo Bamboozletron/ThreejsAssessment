@@ -1,7 +1,7 @@
 import * as THREE from 'three'
-import Renderer from './Renderer/Renderer';
-import BasicTestScene from './Scenes/BasicSceneTest';
-import BaseScene from './Scenes/SceneSetup/BaseScene';
+import Renderer from './src/Renderer/Renderer';
+import BasicTestScene from './src/Scenes/BasicSceneTest';
+import BaseScene from './src/Scenes/SceneSetup/BaseScene';
 
 // One large "full screen" renderer for this testing.
 class ThreeJSTesting
@@ -26,6 +26,7 @@ class ThreeJSTesting
         document.body.appendChild(this.renderer.domElement);            
 
         await this.baseScene.initialize(this.renderer);
+
         this.renderer.activeScene = this.baseScene;    
         this.renderer.setClearColor(0x999999, 1.0);
 
