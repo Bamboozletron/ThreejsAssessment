@@ -1,7 +1,7 @@
 import * as THREE from 'three'
-import * as ThreeHelpers from './Util/ThreeHelpers';
+import * as ThreeHelpers from '../Util/ThreeHelpers';
 
-export default class LabScale
+export default class LabScaleEntity
 {
         
     // Objects/Group
@@ -39,7 +39,7 @@ export default class LabScale
     // Where to place things for the scale weight
     private scaleContainer!: THREE.Group;
     private scaleRotation: number = -0.24;
-
+    
     async initialize(scene: THREE.Scene)
     {
         document.addEventListener('keyup', event => this.onKeyUp(event), false);
@@ -119,7 +119,6 @@ export default class LabScale
         this.scaleContainer.scale.set(1.0/0.8, 1.0/0.8, 1.0/0.8);
 
         this.scaleGroup.add(this.scaleContainer);
-        scene.add(this.scaleGroup);
     }
 
 

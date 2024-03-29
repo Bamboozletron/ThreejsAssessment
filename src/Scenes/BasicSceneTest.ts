@@ -7,6 +7,12 @@ import LabScale from '../LabScale';
 
 import * as ThreeHelpers from '../Util/ThreeHelpers';
 
+import EntityManager from '../EntityComponent/EntityManager';
+import {Entity} from '../EntityComponent/Entity';
+import {ScaleVisualComponent} from '../Components/ScaleComponents/ScaleVisualComponent';
+import { ScaleWeightComponent } from '../Components/ScaleComponents/ScaleWeightComponent';
+import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+
 export default class BasicTestScene extends BaseScene
 {
     mainCamera: any;
@@ -14,20 +20,55 @@ export default class BasicTestScene extends BaseScene
 
     timeElapsed: number = 0;
 
-    labScale?: LabScale;
+    entityManager: EntityManager;
 
     constructor()
-    {
+    {        
         super();
+        this.entityManager = new EntityManager();
     }
     
     async initialize(renderer: Renderer)
     {
         super.initialize(renderer);
+        this.initializeBasicScene(renderer);
 
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        // Creating entities
+        this.createScaleEntity();
+        this.setupTable();
 
+        // Wait for all the loading of models
+        // await Promise.all([
+        //     this.setupTable(),
+        // ])
+    }
+
+    createScaleEntity()
+    {
+        const params = {
+            scene: this,
+        }
+
+        var scaleEntity = new Entity();
+        var visualComponent = new ScaleVisualComponent(params);
+        var weightComponent = new ScaleWeightComponent(params);
+        scaleEntity.addComponent(visualComponent);
+        scaleEntity.addComponent(weightComponent);
+
+        this.entityManager.addEntity(scaleEntity);
+
+        // Positioning scale where I want
+        scaleEntity.group.scale.set(0.8, 0.8, 0.8);
+        scaleEntity.group.position.set(0.45, 1.03, 0.0);
+        scaleEntity.group.rotateOnAxis(new THREE.Vector3(0.0, 1.0, 0.0), -0.24);
+
+        // Add entities group to the scene for rendering
+        this.add(scaleEntity.group);        
+    }
+
+    // Camera/controls/skybox setup.  Could also be it's own entity now
+    initializeBasicScene(renderer: Renderer)
+    {
         // Create basic scene
         this.mainCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100.0);
         this.mainCamera.position.set(0,1.8,3);
@@ -54,40 +95,23 @@ export default class BasicTestScene extends BaseScene
             './resources/skybox/Cold_Sunset__Cam_1_Back-Z.png',
         ]);
         this.background = texture;
-
-        
-        this.labScale = new LabScale();
-
-        // const cube = new THREE.BoxGeometry();
-        // const cubeMesh = new THREE.Mesh(cube);
-        // cubeMesh.castShadow = true;
-        // cubeMesh.scale.set(0.4, 0.4, 0.4);
-        // cubeMesh.position.set(-0.2, 1.5, 0.0);
-
-        // this.add(cubeMesh);
-
-        // Wait for all the loading of models
-        await Promise.all([
-            this.labScale.initialize(this),
-            this.setupTable(),
-        ])
     }
 
-
-    async setupTable()
+    // Ideally table would be split out into it's own entity now, postponing that to get the actual stuff done though
+    setupTable()
     {
-        const tableModel = await ThreeHelpers.LoadGLTF("./resources/models/table.glb")
-        .catch(err => {
-            console.log("Error loading model:\n" + err);
-        });        
+        ThreeHelpers.LoadGLFT("./resources/models/table.glb", this)
+    }
 
-        if (tableModel != null)
+    modelLoaded(gltf: GLTF)
+    {
+        if (gltf != null)
         {
             const tableMat = new THREE.MeshPhongMaterial({
                 color: 0x996633,            
             });
 
-            tableModel.scene.children.forEach((o) => 
+            gltf.scene.children.forEach((o) => 
             {    
                 if (o instanceof THREE.Mesh)
                 {                    
@@ -95,13 +119,13 @@ export default class BasicTestScene extends BaseScene
                 }
             })
 
-            this.add(tableModel!.scene);
+            this.add(gltf!.scene);
         }
-    }    
+    }
 
     update(delta: number)
     {
         this.timeElapsed += delta;        
-        this.labScale?.update(delta);
+        this.entityManager.updateEntities(delta);
     }
 }

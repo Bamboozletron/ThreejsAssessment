@@ -15,6 +15,21 @@ export async function createCustomMaterial(vshPath: string, fshPath: string):  P
     return customMaterial;
 }
 
+// Non-async, specify onLoad
+export function LoadGLFT(modelPath: string, object: any)
+{
+    const loader = new GLTFLoader();
+    loader.load(modelPath, function (gltf)
+    {            
+        object.modelLoaded(gltf);
+    }, undefined, function(error)
+    {
+        console.log(error);
+    });
+}
+
+
+// Async, maybe not used anymore? TBD if I go back and switch more stuff to async
 export function LoadAndSplitGLTF(modelPath: string): Promise<Array<THREE.Object3D>>
 {
     return new Promise((resolve, reject) => {
