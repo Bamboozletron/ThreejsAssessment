@@ -4,30 +4,42 @@ import * as ThreeHelpers from './Util/ThreeHelpers';
 export default class LabScale
 {
         
+    // Objects/Group
     scaleGroup?: THREE.Group;
     
     mainScale!: THREE.Object3D;
     scalePlate!: THREE.Object3D;
     scaleScreen!: THREE.Object3D;
 
+    // Materials
     mainScaleMat!: THREE.Material;
     plateMat!: THREE.Material;
     screenMat!: THREE.Material;
 
-    height: number = 500;
-    width: number = 1000;
-
-    planeTest!: any;
+    // Canvas texture elements for scale display
+    canvasHeight: number = 500;
+    canvasWidth: number = 1000;
 
     textCanvas!: HTMLCanvasElement;
     canvasContext!: CanvasRenderingContext2D | null;
     canvasTexture!: THREE.Texture;
 
-    testNum: number = 0;
+    // Weight display
+    changingWeight: boolean = false;
+    currentWeight: number = 0;    
+    beginningWeight: number = 0;
+    targetWeight: number = 0;
+
+    timeToChange: number = 6;
+    timeProgress: number = 0;
+
+    scaleDigitsToShow: number = 9;
+
+    
     
     async initialize(scene: THREE.Scene)
     {
-        
+        document.addEventListener('keyup', event => this.onKeyUp(event), false);
         await this.SetupTextPlane(scene);
         await this.loadCustomMaterial();
         await this.loadScaleModel(scene);
@@ -36,8 +48,8 @@ export default class LabScale
     async SetupTextPlane(scene: THREE.Scene)
     {
         this.textCanvas = document.createElement('canvas');
-        this.textCanvas.width = this.width;
-        this.textCanvas.height = this.height;
+        this.textCanvas.width = this.canvasWidth;
+        this.textCanvas.height = this.canvasHeight;
 
         this.canvasContext = this.textCanvas.getContext('2d');
 
@@ -46,12 +58,12 @@ export default class LabScale
             this.canvasContext.font = '160px Arial';
 
             this.canvasContext.fillStyle = 'white'
-            this.canvasContext.fillRect(0, 0, this.width, this.height);
+            this.canvasContext.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
             this.canvasContext.fillStyle = 'black';        
             this.canvasContext.textAlign = "center";
             this.canvasContext.textBaseline = "middle";
-            this.canvasContext.fillText("00000.00g", this.width/2, this.height/2);
+            this.canvasContext.fillText("00000.00g", this.canvasWidth/2, this.canvasHeight/2);
         }
 
         this.canvasTexture = new THREE.Texture(this.textCanvas);
@@ -123,29 +135,80 @@ export default class LabScale
     update(delta: number)
     {
 
-        // this.testNum += 1;
-        // if (this.canvasContext)
-        // {
-        //     this.canvasContext.font = '160px Arial';
+        if (this.changingWeight && this.timeProgress <= this.timeToChange)
+        {
+            this.currentWeight = this.interpolateWeight(this.beginningWeight, this.targetWeight, this.timeProgress/this.timeToChange);
+            this.timeProgress+= delta;            
 
-        //     this.canvasContext.fillStyle = 'white'
-        //     this.canvasContext.fillRect(0, 0, this.width, this.height);
+            this.setScaleWeightTexture(this.currentWeight);
+        }
+        else
+        {
+            this.changingWeight = false;
+            this.timeProgress = 0;
+            this.currentWeight = this.targetWeight;
 
-        //     this.canvasContext.fillStyle = 'black';        
-        //     this.canvasContext.textAlign = "center";
-        //     this.canvasContext.textBaseline = "middle";
-        //     this.canvasContext.fillText(this.testNum.toString(), this.width/2, this.height/2);
-        // }
-        // this.canvasTexture.needsUpdate = true;
+            this.setScaleWeightTexture(this.currentWeight);
+        }
     }
 
-    setScaleWeight(weight: number)
-    {
-
+    changeScaleWeight(targetWeight: number)
+    {        
+        this.timeProgress = 0.0;
+        this.targetWeight = targetWeight;    
+        this.beginningWeight = this.currentWeight;
+        this.changingWeight = true;
     }
 
-    formatWeight(weight: number)
+    setScaleWeightTexture(targetWeight: number)
     {
+        if (this.canvasContext)
+        {
+            this.canvasContext.font = '160px Arial';
 
+            this.canvasContext.fillStyle = 'white'
+            this.canvasContext.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+            this.canvasContext.fillStyle = 'black';        
+            this.canvasContext.textAlign = "center";
+            this.canvasContext.textBaseline = "middle";
+            this.canvasContext.fillText(this.formatWeight(targetWeight), this.canvasWidth/2, this.canvasHeight/2);
+        }
+        this.canvasTexture.needsUpdate = true;
+    }
+
+    formatWeight(weight: number): string
+    {        
+        var weightString = weight.toFixed(2) + "g";
+        const length = weightString.length;
+        if (length < this.scaleDigitsToShow)
+        {
+            const toAdd = this.scaleDigitsToShow - length;
+            for (let i = 0; i < toAdd; i++)
+            {
+                weightString = "0" + weightString;
+            }
+        }
+        return weightString;
+    }
+
+
+    // Splitting into it's own function to mess with other curves possibly
+    interpolateWeight(start: number, end: number, progress: number): number
+    {
+        //  Simple lerp, haven't figured math out for other ones and am wasting time
+        return THREE.MathUtils.lerp(start, end, progress);        
+    }
+
+
+    onKeyUp(event: KeyboardEvent)
+    {
+        switch (event.code)
+        {
+            case "Space":
+                console.log("SPACE");
+                this.changeScaleWeight(this.currentWeight + 100.0);
+                break;
+        }
     }
 }
