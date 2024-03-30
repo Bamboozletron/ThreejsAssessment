@@ -3,8 +3,6 @@ import {Component} from "./Component";
 
 export class Entity
 {
-    public readonly uuid: string = "";
-
     private name: string = "";    
     private components: Array<Component>;
 
@@ -14,10 +12,13 @@ export class Entity
 
     constructor()
     {     
-        this.uuid = crypto.randomUUID();   
         this.components = new Array<Component>();
-
         this.group = new THREE.Group();
+    }
+
+    getName(): string
+    {
+        return this.name;
     }
 
     setName(name: string)

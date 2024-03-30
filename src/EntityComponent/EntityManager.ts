@@ -9,10 +9,25 @@ export default class EntityManager
         this.entities = new Array<Entity>();        
     }
 
-    addEntity(entity: Entity)
+    addEntity(entity: Entity, name: string)
     {
+        entity.setName(name);
         this.entities.push(entity);
         entity.initialize();
+    }
+
+    // Could be improved with map
+    getEntity(name: string)
+    {
+        for (var k in this.entities)
+        {
+            if (this.entities[k].getName() == name)
+            {
+                return this.entities[k];
+            }
+        }
+
+        return null;
     }
 
     removeEntity(entity: Entity)

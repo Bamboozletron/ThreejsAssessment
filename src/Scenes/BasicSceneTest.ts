@@ -1,17 +1,18 @@
 import * as THREE from 'three'
-import StationaryOrbit from '../Camera/StationaryOrbit';
+import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
+import StationaryOrbit from '../Camera/StationaryOrbit';
 import BaseScene from './SceneSetup/BaseScene'
 import Renderer from '../Renderer/Renderer';
-import LabScale from '../LabScale';
 
 import * as ThreeHelpers from '../Util/ThreeHelpers';
 
 import EntityManager from '../EntityComponent/EntityManager';
 import {Entity} from '../EntityComponent/Entity';
 import {ScaleVisualComponent} from '../Components/ScaleComponents/ScaleVisualComponent';
-import { ScaleWeightComponent } from '../Components/ScaleComponents/ScaleWeightComponent';
-import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import {ScaleWeightComponent} from '../Components/ScaleComponents/ScaleWeightComponent';
+import {MousePointerComponent} from '../Components/MouseHandlingComponent/MousePointerComponent';
+
 
 export default class BasicTestScene extends BaseScene
 {
@@ -34,13 +35,29 @@ export default class BasicTestScene extends BaseScene
         this.initializeBasicScene(renderer);
 
         // Creating entities
+        this.createMouseHandlerEntity();
         this.createScaleEntity();
+
         this.setupTable();
 
         // Wait for all the loading of models
         // await Promise.all([
         //     this.setupTable(),
         // ])
+    }
+
+    createMouseHandlerEntity()
+    {
+        const params = {
+            scene: this,
+            camera: this.mainCamera,
+        }
+
+        var mouseEntity = new Entity();
+        var mousePointerComponent= new MousePointerComponent(params);
+        mouseEntity.addComponent(mousePointerComponent);
+
+        this.entityManager.addEntity(mouseEntity, "MousePointerEntity");        
     }
 
     createScaleEntity()
@@ -55,7 +72,7 @@ export default class BasicTestScene extends BaseScene
         scaleEntity.addComponent(visualComponent);
         scaleEntity.addComponent(weightComponent);
 
-        this.entityManager.addEntity(scaleEntity);
+        this.entityManager.addEntity(scaleEntity, "ScaleEntity");
 
         // Positioning scale where I want
         scaleEntity.group.scale.set(0.8, 0.8, 0.8);

@@ -26,7 +26,7 @@ export class ScaleVisualComponent extends Component
  
      private textCanvas!: HTMLCanvasElement;
      private canvasContext!: CanvasRenderingContext2D | null;
-     private canvasTexture!: THREE.Texture;
+     private canvasTexture!: THREE.Texture;     
 
      constructor(params: any)
      {
