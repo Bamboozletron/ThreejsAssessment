@@ -11,8 +11,11 @@ export default class EntityManager
 
     addEntity(entity: Entity, name: string)
     {
-        entity.setName(name);
-        this.entities.push(entity);
+
+        entity.setName(name);        
+        entity.manager = this;
+
+        this.entities.push(entity);        
         entity.initialize();
     }
 

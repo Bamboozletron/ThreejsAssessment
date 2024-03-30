@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import {Component} from "./Component";
+import EntityManager from './EntityManager';
 
 export class Entity
 {
@@ -9,6 +10,11 @@ export class Entity
     // Possibly a weird idea. Each Entity has a top level "Group" from threejs for positioning
     // Let components handle more complicated entity setup for now (ie, no heirarchy for entities yet)
     group: THREE.Group;
+    manager!: EntityManager;
+
+    // Handlers for events (Referencing SimonDev entity setup for mouse events)
+    eventHandlers: Map<string, Array<Function>> = new Map<string, Array<Function>>();
+
 
     constructor()
     {     
@@ -75,6 +81,37 @@ export class Entity
         for(var k in this.components)
         {
             this.components[k].update(delta);
+        }
+    }
+
+    addEventHandler(name: string, fn: Function)
+    {
+        if (!this.eventHandlers.has(name))
+        {
+            const fnArray = new Array<Function>();
+            fnArray.push(fn);
+            this.eventHandlers.set(name, fnArray);
+        }
+        else
+        {
+            this.eventHandlers.get(name)?.push(fn);
+        }
+    }
+
+    broadcastEvent(eventData: any)
+    {
+        // Probably a better way to collapse a has/get to be one call
+        if (this.eventHandlers.has(eventData.eventName))
+        {
+            let fnArray = this.eventHandlers.get(eventData.eventName);
+
+            if (fnArray)
+            {                
+                for (let currHandler of fnArray)
+                {
+                    currHandler(eventData);
+                }
+            }
         }
     }
 

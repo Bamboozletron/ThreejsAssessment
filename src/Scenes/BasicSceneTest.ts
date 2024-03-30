@@ -9,9 +9,13 @@ import * as ThreeHelpers from '../Util/ThreeHelpers';
 
 import EntityManager from '../EntityComponent/EntityManager';
 import {Entity} from '../EntityComponent/Entity';
+
 import {ScaleVisualComponent} from '../Components/ScaleComponents/ScaleVisualComponent';
 import {ScaleWeightComponent} from '../Components/ScaleComponents/ScaleWeightComponent';
 import {MousePointerComponent} from '../Components/MouseHandlingComponent/MousePointerComponent';
+import {BasicGeometryComponent} from '../Components/BasicGeometryComponent';
+import {SelectableComponent} from '../Components/MouseHandlingComponent/SelectableComponent';
+import { WeighableComponent } from '../Components/ScaleComponents/WeighableComponent';
 
 
 export default class BasicTestScene extends BaseScene
@@ -22,6 +26,9 @@ export default class BasicTestScene extends BaseScene
     timeElapsed: number = 0;
 
     entityManager: EntityManager;
+
+    scaleGroup!: THREE.Group;
+    scaleComponent!: ScaleWeightComponent;
 
     constructor()
     {        
@@ -34,9 +41,11 @@ export default class BasicTestScene extends BaseScene
         super.initialize(renderer);
         this.initializeBasicScene(renderer);
 
-        // Creating entities
+        // Creating entities        
         this.createMouseHandlerEntity();
         this.createScaleEntity();
+
+        this.createWeightedCube();
 
         this.setupTable();
 
@@ -53,8 +62,8 @@ export default class BasicTestScene extends BaseScene
             camera: this.mainCamera,
         }
 
-        var mouseEntity = new Entity();
-        var mousePointerComponent= new MousePointerComponent(params);
+        const mouseEntity = new Entity();
+        const mousePointerComponent= new MousePointerComponent(params);
         mouseEntity.addComponent(mousePointerComponent);
 
         this.entityManager.addEntity(mouseEntity, "MousePointerEntity");        
@@ -66,16 +75,15 @@ export default class BasicTestScene extends BaseScene
             scene: this,
         }
 
-        var scaleEntity = new Entity();
-        var visualComponent = new ScaleVisualComponent(params);
-        var weightComponent = new ScaleWeightComponent(params);
+        const scaleEntity = new Entity();
+        const visualComponent = new ScaleVisualComponent(params);
+        this.scaleComponent = new ScaleWeightComponent(params);
         scaleEntity.addComponent(visualComponent);
-        scaleEntity.addComponent(weightComponent);
+        scaleEntity.addComponent(this.scaleComponent);
 
         this.entityManager.addEntity(scaleEntity, "ScaleEntity");
 
         // Positioning scale where I want
-        scaleEntity.group.scale.set(0.8, 0.8, 0.8);
         scaleEntity.group.position.set(0.45, 1.03, 0.0);
         scaleEntity.group.rotateOnAxis(new THREE.Vector3(0.0, 1.0, 0.0), -0.24);
 
@@ -83,12 +91,51 @@ export default class BasicTestScene extends BaseScene
         this.add(scaleEntity.group);        
     }
 
+    createWeightedCube()
+    {
+        const params = {
+            scene: this,
+        }
+
+        const box = new THREE.BoxGeometry();
+        const material = new THREE.MeshPhongMaterial(
+            {
+                color: 0x00A2B4,
+            }
+        );
+
+        const cubeEntity = new Entity();        
+
+        // Setup component
+        const geometryComponent = new BasicGeometryComponent(params);
+        geometryComponent.setGeometry(box);
+        geometryComponent.setMaterial(material);
+        geometryComponent.createMesh();
+
+        const selectComponent = new SelectableComponent(params);        
+        selectComponent.setSelectableObject(geometryComponent.mesh);
+
+        const weighableComponent = new WeighableComponent(params);
+        weighableComponent.setScaleComponent(this.scaleComponent); // I know I'm making the scale first, so just save the component above intsead of going through entity manager
+
+        cubeEntity.addComponent(geometryComponent);
+        cubeEntity.addComponent(selectComponent);
+        cubeEntity.addComponent(weighableComponent);
+
+        cubeEntity.group.scale.set(0.25, 0.25, 0.25);
+        cubeEntity.group.position.set(-0.45, 1.15, 0.0);
+
+        this.entityManager.addEntity(cubeEntity, "WeightedCube");    
+        
+        this.add(cubeEntity.group);
+    }
+
     // Camera/controls/skybox setup.  Could also be it's own entity now
     initializeBasicScene(renderer: Renderer)
     {
         // Create basic scene
         this.mainCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100.0);
-        this.mainCamera.position.set(0,1.8,3);
+        this.mainCamera.position.set(0,1.6,1.2);
 
         this.orbit = new StationaryOrbit(this.mainCamera, renderer.domElement);
         this.orbit.target.set(0, 1, -2);

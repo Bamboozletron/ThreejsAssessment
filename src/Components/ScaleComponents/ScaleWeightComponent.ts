@@ -20,7 +20,6 @@ export class ScaleWeightComponent extends Component
         private scaleDigitsToShow: number = 9;
 
         private visualComponent!: ScaleVisualComponent | null; 
-        private mousePointerComponent!: MousePointerComponent | null; 
 
         constructor(params: any)
         {
@@ -32,8 +31,6 @@ export class ScaleWeightComponent extends Component
         {
             this.visualComponent = <ScaleVisualComponent>this.entity?.getComponent("ScaleVisualComponent");
             document.addEventListener('keyup', event => this.onKeyUp(event), false);
-
-            this.mousePointerComponent = this.params.scene.entityManager.getEntity("MousePointerEntity").getComponent("MousePointerComponent");
         }
         
         initializeComponent()
@@ -93,8 +90,6 @@ export class ScaleWeightComponent extends Component
                     this.visualComponent?.setScaleWeightTexture(this.formatWeight(this.currentWeight));
                 }
             }
-
-            console.log("FART" + this.mousePointerComponent!.pointerPos);
         }
 
         onKeyUp(event: KeyboardEvent)

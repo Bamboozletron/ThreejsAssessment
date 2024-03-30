@@ -104,22 +104,10 @@ export class ScaleVisualComponent extends Component
     {        
         this.scaleGroup.add(this.mainScale);
         this.scaleGroup.add(this.scalePlate);
-        this.scaleGroup.add(this.scaleScreen);
+        this.scaleGroup.add(this.scaleScreen);    
 
-        // const cube = new THREE.BoxGeometry(0.4, 0.4, 0.4);        
-        // const mat = new THREE.MeshPhongMaterial();
+        this.scaleGroup.scale.set(0.8, 0.8, 0.8);
 
-        // cube.computeBoundingBox();
-        // console.log(cube.boundingBox?.min.y);
-
-        
-        this.scaleContainer.position.set(0,0.125,0);
-        // Undo scaling of scale instelf for this group so objects I move to this position will stay the same size
-
-        this.scaleContainer.scale.set(1.0/0.8, 1.0/0.8, 1.0/0.8);
-        this.scaleGroup.add(this.scaleContainer);
-
-        // this.params.scene.add(this.scaleGroup);
         this.entity?.group.add(this.scaleGroup);
     }
 

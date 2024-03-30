@@ -118,7 +118,7 @@ export default class LabScale
         // Undo scaling of scale instelf for this group so objects I move to this position will stay the same size
         this.scaleContainer.scale.set(1.0/0.8, 1.0/0.8, 1.0/0.8);
 
-        this.scaleGroup.add(this.scaleContainer);
+        // this.scaleGroup.add(this.scaleContainer);
         scene.add(this.scaleGroup);
     }
 

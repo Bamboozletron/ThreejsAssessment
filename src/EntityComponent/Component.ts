@@ -11,4 +11,9 @@ export class Component
         this.entity = entity;
     }
     update(delta: number){};
+
+    addEventHandler(name: string, fn: Function)
+    {
+        this.entity?.addEventHandler(name, fn);
+    }
 }
