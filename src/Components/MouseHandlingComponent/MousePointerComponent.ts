@@ -1,14 +1,16 @@
 import * as THREE from 'three';
 import {Component} from '../../EntityComponent/Component';
 
-
+/**
+ * Component to track mouse movement on the screen.  Tracks position/interactions
+ */
 export class MousePointerComponent extends Component
 {
-    params: any;
+    private params: any;
+
+    private intersections!: THREE.Intersection<THREE.Object3D<THREE.Object3DEventMap>>[];
 
     raycaster!: THREE.Raycaster;    
-    intersections!: THREE.Intersection<THREE.Object3D<THREE.Object3DEventMap>>[];
-
     pointerPos: THREE.Vector2;
 
     constructor(params: any)
@@ -27,6 +29,9 @@ export class MousePointerComponent extends Component
         this.raycaster = new THREE.Raycaster();
     }
 
+    /** Sets intersections and pointerposition from the mouse event
+     * @param event mouse event data
+     */
     onMouseMove(event: MouseEvent)
     {
         this.pointerPos.x = (event.clientX/window.innerWidth) * 2 - 1;
@@ -37,6 +42,7 @@ export class MousePointerComponent extends Component
         this.intersections = this.raycaster.intersectObjects(this.params.scene.children);
     }
 
+    /** Get the current first intersection of this component */
     getFirstIntersection(): THREE.Object3D | null
     {
         if (this.intersections)
@@ -46,7 +52,7 @@ export class MousePointerComponent extends Component
                 return (<THREE.Object3D>this.intersections[0].object);
             }
         }
-        
+
         return null;
     }
 }

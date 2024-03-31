@@ -1,39 +1,53 @@
 import * as THREE from 'three';
 import {Component} from '../EntityComponent/Component';
 
-// Just using this for basic basic shapes on entity. Loses "nice" way to customize geometry though
+/** Component for a very simple Geometry */
 export class BasicGeometryComponent extends Component
 {
-    params: any;
+    private params: any;
 
-    geometry!: THREE.BufferGeometry
+    private geometry!: THREE.BufferGeometry
+    private mat!: THREE.Material;    
+
     mesh!: THREE.Mesh;
-    mat!: THREE.Material;    
 
-    castShadows: boolean = false;
+    private castShadows: boolean = false;
 
     constructor(params: any)
     {
         super();
         this.params = params;
-        this.castShadows = this.params.castShadows;
-    }
+        this.castShadows = this.params.castShadows;    
+    }    
 
     initializeEntity()
     {        
         this.entity?.group.add(this.mesh);
     }
 
+    /**
+     * Sets the generated geometry for this component
+     * @param geometry Supplied buffer geometry
+     */
     setGeometry(geometry: THREE.BufferGeometry)
     {
         this.geometry = geometry;
     }
 
+    /**
+     * Sets the material for this entity
+     * @param material supplied material
+     */
     setMaterial(material: THREE.Material)
     {
         this.mat = material;
     }
 
+    /**
+     * Generate the mesh from the given geometry and material
+     * @remarks
+     * Must be called after setGeometry/setMesh which isn't ideal
+     */
     createMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.mat);

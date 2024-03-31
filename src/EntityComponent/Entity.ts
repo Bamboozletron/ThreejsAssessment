@@ -2,48 +2,48 @@ import * as THREE from 'three'
 import {Component} from "./Component";
 import EntityManager from './EntityManager';
 
+/** Represents an Entity in Entity-Component framework
+ * Entity consists of multiple {@link Component}
+ * @remarks
+ * Could probably switch the Array<Component> of components to be Map<string, Array<Component>> for better access of components
+*/
 export class Entity
 {
-    private name: string = "";    
-    private components: Array<Component>;
+    name: string = "";       
 
     // Possibly a weird idea. Each Entity has a top level "Group" from threejs for positioning
     // Let components handle more complicated entity setup for now (ie, no heirarchy for entities yet)
     group: THREE.Group;
     manager!: EntityManager;
 
-    // Handlers for events (Referencing SimonDev entity setup for mouse events)
-    eventHandlers: Map<string, Array<Function>> = new Map<string, Array<Function>>();
+    private eventHandlers: Map<string, Array<Function>> = new Map<string, Array<Function>>();
+    private components: Array<Component>;
 
-
+    /** Creates a new entity 
+     * @remarks 
+     * Initializes component array and creates that top level group
+    */
     constructor()
     {     
         this.components = new Array<Component>();
         this.group = new THREE.Group();
     }
 
-    getName(): string
-    {
-        return this.name;
-    }
-
-    setName(name: string)
-    {
-        this.name = name;
-    }
-
-    setPosition(x: number, y:number, z:number)
-    {
-        this.group.position.set(x,y,z);
-    }
-
+    /** Add a component to the entity
+     * @remarks
+     * {@link Component.initializeComponent} called from here
+    */
     addComponent(component: Component)
     {        
         this.components.push(component);
         component.initializeComponent();
-        component.setEntity(this);
+        component.entity = this;
     }
 
+    /** Remove a component from the entity
+     * @remarks
+     * Honestly untested in the current application because it wasn't really necessary.  
+    */
     removeComponent(component: Component)
     {
         const index = this.components.indexOf(component);
@@ -53,7 +53,7 @@ export class Entity
         }
     }
 
-    // Assume no duplicate components for now
+    /** Get a specific component from the entity based on type name */
     getComponent(type: string): Component | null
     {
         for (var k in this.components)
@@ -68,6 +68,11 @@ export class Entity
         return null;
     }
 
+    /** Initialize the entity.
+    *  @remarks 
+    * Called from {@link EntityManager.addEntity}
+    * Happens AFTER {@link Component.initializeComponent}
+    */
     initialize()
     {
         for(var k in this.components)
@@ -84,6 +89,10 @@ export class Entity
         }
     }
 
+    /** Add event handlers to the entity.
+     * @param name Name of event to listen to
+     * @param fn function callback
+    */
     addEventHandler(name: string, fn: Function)
     {
         if (!this.eventHandlers.has(name))
@@ -98,6 +107,9 @@ export class Entity
         }
     }
 
+    /** Broadcast an event across the entity
+     * @param eventData Contains all event data, including an eventName
+    */
     broadcastEvent(eventData: any)
     {
         // Probably a better way to collapse a has/get to be one call

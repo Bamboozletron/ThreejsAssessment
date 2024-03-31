@@ -2,10 +2,11 @@ import * as THREE from 'three';
 import {Component} from '../../EntityComponent/Component';
 import { MousePointerComponent } from './MousePointerComponent';
 
+/** A component to track when the entity is selected by mouse click*/
 export class SelectableComponent extends Component
 {
     // Get the general MousePointerComponent existing in the scene
-    selectableObject!: THREE.Object3D;
+    private selectableObject!: THREE.Object3D;
     mousePointerHandler!: MousePointerComponent;    
 
     constructor(params: any)
@@ -23,11 +24,18 @@ export class SelectableComponent extends Component
         this.mousePointerHandler = <MousePointerComponent>this.entity?.manager.getEntity("MousePointerEntity")?.getComponent("MousePointerComponent");
     }
 
+    /** Set the object to track
+     * @remarks Could possibly just default to the entity.group
+     * @param obj The reference to which object to track selection on
+     */
     setSelectableObject(obj: THREE.Object3D)
     {
         this.selectableObject = obj;
     }
     
+    /**Broadcast entitySelected event if the selected object is intersected
+     * @param eventData mouse event data
+     */
     onMouseUp(eventData: MouseEvent)
     {
         const intersections = this.mousePointerHandler.raycaster.intersectObject(this.entity!.group, true);

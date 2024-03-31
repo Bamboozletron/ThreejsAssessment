@@ -3,13 +3,14 @@ import * as ThreeHelpers from '../../Util/ThreeHelpers';
 import {Component} from '../../EntityComponent/Component';
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
+/** Represents the visual components of the lab scale
+ * @remarks
+ * In it's own component because it's a bit more complicated with multiple meshes split from a single GLB file
+ */
 export class ScaleVisualComponent extends Component
 {
-     private params: any;
-
      // Objects/Group
      private scaleGroup: THREE.Group;
-     private scaleContainer: THREE.Group;
     
      private mainScale!: THREE.Object3D;
      private scalePlate!: THREE.Object3D;
@@ -28,28 +29,26 @@ export class ScaleVisualComponent extends Component
      private canvasContext!: CanvasRenderingContext2D | null;
      private canvasTexture!: THREE.Texture;     
 
+     /**
+      * Creates new Lab Scale Visuals component
+      */
      constructor(params: any)
      {
         super();
-        this.params = params;        
-
         this.scaleGroup = new THREE.Group();
-        this.scaleContainer = new THREE.Group();
      };
 
     initializeEntity()
     {
-        this.loadScaleModel();
-    }
-
-    loadScaleModel()
-    {
         this.setupTextPlaneAndScreenMat();
         this.loadBasicScaleMats();
-        ThreeHelpers.LoadGLFT("./resources/models/scale.glb", this)        
+        ThreeHelpers.LoadGLFT("./resources/models/scale.glb", this);
     }
 
-    loadBasicScaleMats()
+    /**
+     * Creates two basic materials for the main body and the plate
+     */
+    private loadBasicScaleMats()
     {
         this.mainScaleMat = new THREE.MeshPhongMaterial({
             color: 0x7f7f7f,
@@ -60,6 +59,10 @@ export class ScaleVisualComponent extends Component
         });
     }
 
+    /**
+     * Callback for when the model is finished loading
+     * @param gltf the loaded model
+     */
     modelLoaded(gltf: GLTF)
     {        
         var model = gltf.scene;
@@ -73,11 +76,16 @@ export class ScaleVisualComponent extends Component
             }
         })
 
-         this.assignObjects(meshArray);
-         this.setupGroup();
+        this.assignObjects(meshArray);
+        this.setupGroup();
     }
 
-    assignObjects(meshArray: Array<THREE.Object3D>)
+    /**
+     * Assigns split mesh to class members based on name and sets their materials
+     * @remarks
+     * Probably not the best way to do this, not much experience with loading multiple mesh models though.
+     */
+    private assignObjects(meshArray: Array<THREE.Object3D>)
     {
         for (var k in meshArray)
         {
@@ -101,7 +109,10 @@ export class ScaleVisualComponent extends Component
         }
     }
 
-    setupGroup()
+    /**  
+     * Adds individual meshes to a single {@link THREE.Group} to have them operate as a single unit
+    */
+    private setupGroup()
     {        
         this.scaleGroup.add(this.mainScale);
         this.scaleGroup.add(this.scalePlate);
@@ -112,7 +123,13 @@ export class ScaleVisualComponent extends Component
         this.entity?.group.add(this.scaleGroup);
     }
 
-    setupTextPlaneAndScreenMat()
+    /**
+     * Sets up a text canvas that is then converted to a texture for use as the scales screen
+     * @remarks
+     * Was a pretty confusing process, referenced {@link https://jsfiddle.net/m64x29p8/} quite a bit from a forum post
+     * Couldn't figure out how to get custom fonts working
+     */
+    private setupTextPlaneAndScreenMat()
     {
         this.textCanvas = document.createElement('canvas');
         this.textCanvas.width = this.canvasWidth;
@@ -133,13 +150,22 @@ export class ScaleVisualComponent extends Component
             this.canvasContext.fillText("00000.00g", this.canvasWidth/2, this.canvasHeight/2);
         }
 
+        // Creating textutre from this canvas
         this.canvasTexture = new THREE.Texture(this.textCanvas);
-        this.canvasTexture.minFilter = THREE.LinearFilter;
+        this.canvasTexture.minFilter = THREE.LinearFilter; // Keeps text a bit crisper
         this.canvasTexture.needsUpdate = true;
 
+        // Assign it to our screenMaterial
         this.screenMat = new THREE.MeshBasicMaterial({ map: this.canvasTexture, });        
     }
 
+
+    /**
+     * Sets the scales screen to display a given string
+     * @param targetWeight string to display
+     * @remarks
+     * Seems like it has to be refilled every time otherwise it just painted over the old texture
+     */
     setScaleWeightTexture(targetWeight: string)
     {
         if (this.canvasContext)

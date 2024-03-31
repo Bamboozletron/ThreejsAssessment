@@ -1,38 +1,28 @@
 import * as THREE from 'three'
-import Renderer from '../../Renderer/Renderer';
+import {Renderer} from '../../Renderer/Renderer';
 
-// Simple wrapping of THREE.Scene, not 100% sure what should live here yet
-export default class BaseScene extends THREE.Scene
+/** Simple wrapping of THREE.Scene
+ * @remarks
+ * Not 100% if this is necessary or what should live here yet.
+ * Overall both this and {@link Renderer} could use anotehr think through
+*/
+export abstract class BaseScene extends THREE.Scene
 {
+    /** Get/set the main {@link THREE.Camera} for the scene*/
     mainCamera: THREE.Camera;
-
-    // Mouse movement / raycaster       
-    pointer: THREE.Vector2;
-    raycaster: THREE.Raycaster;
     
+    /** Creates new BaseScene */
     constructor()
     {
         super();
-        this.mainCamera = new THREE.PerspectiveCamera(70, 1920.0 / 1080.0, 0.1, 100); // Default camera, mostly to ensure it has one?
-        this.pointer = new THREE.Vector2(0.0, 0.0);
-        this.raycaster = new THREE.Raycaster();
+        this.mainCamera = new THREE.PerspectiveCamera(70, 1920.0 / 1080.0, 0.1, 100); // Default camera, mostly to ensure it has one
     }
 
     async initialize(renderer: Renderer)
-    {
-        
-        window.addEventListener('mousemove', (event) =>
-        {
-            this.onMouseMove(event);
-        }, false);   
-    }
-    
-    // Probably something someday
-    update(delta: number)
     {        
     }
-
-    onMouseMove(event: MouseEvent)
-    {
+    
+    update(delta: number)
+    {        
     }
 }

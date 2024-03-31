@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import {Component} from '../EntityComponent/Component';
 
-// On second thought maybe ColorChangerComponent/OutlineHoverCompoment should extend HoverComponent.  Although I'd be doing the interaction checking multiple times
+/**
+ * Component to add outline via custom shader when hoveored
+ * @remarks
+ * Could probably collapse some of this and {@link ColorChangerComponent}
+ */
 export class OutlineHoverComponent extends Component
 {
-    private material!: THREE.ShaderMaterial;        
-    private isHovered: boolean = false;
+    private material!: THREE.ShaderMaterial;
 
     constructor(params: any)
     {
@@ -17,11 +20,19 @@ export class OutlineHoverComponent extends Component
         this.addEventHandler("entityHoverEnd", (eventData: any) => this.hoverEnd(eventData));
     }
 
+    /**
+     * Set the material to adjust when hovered
+     * @param mat provided material
+     */
     setMaterialToUpdate(mat: THREE.ShaderMaterial)
     {
         this.material = mat;
     }
 
+    /**
+     * Set the outline color
+     * @param color Outline color 
+     */
     setOutlineColor(color: THREE.Color)
     {
         if (this.material)
@@ -30,18 +41,22 @@ export class OutlineHoverComponent extends Component
         }
     }
 
+    /**
+     * Respond to "entityHoverStart" event
+     */
     hoverStart(data: any)
     {
-        this.isHovered = true;
         if (this.material)
         {
             this.material.uniforms.uSelected.value = true;
         }
     }
 
+    /**
+     * Respond to "entityHoverEnd" event
+     */
     hoverEnd(data: any)
     {
-        this.isHovered = false;
         if (this.material)
         {
             this.material.uniforms.uSelected.value = false;

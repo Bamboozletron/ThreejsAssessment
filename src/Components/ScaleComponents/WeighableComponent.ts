@@ -2,22 +2,23 @@ import * as THREE from 'three';
 import { Component } from "../../EntityComponent/Component";
 import { ScaleWeightComponent } from './ScaleWeightComponent';
 
+/**
+ * A componet that indicates an entity can be placed on the scale
+ */
 export class WeighableComponent extends Component
 {
-    params: any;
+    private params: any;
 
     isOnScale: boolean = false;
     weight: number = 423.0;
 
-    tempScaleGroup: THREE.Group = new THREE.Group();
+    private tempScaleGroup: THREE.Group = new THREE.Group();
 
-    originalPos!: THREE.Vector3;
-    originalScale!: THREE.Vector3;
-    originalRot!: THREE.Euler;
+    private originalPos!: THREE.Vector3;
+    private originalScale!: THREE.Vector3;
+    private originalRot!: THREE.Euler;
 
-    scaleWeightComponent!: ScaleWeightComponent;
-
-    lerpTime: number = 1.0;
+    private scaleWeightComponent!: ScaleWeightComponent;
 
     constructor(params: any)
     {
@@ -28,6 +29,7 @@ export class WeighableComponent extends Component
     initializeEntity(): void {
         this.addEventHandler("entitySelected", (eventData: any) => this.onSelect(eventData));
 
+        // Save the original positoin of this (Should move to PlaceOnScale if they ever can move before going on the scale)
         if (this.entity)
         {
             this.originalPos = this.entity.group.position.clone();
@@ -39,6 +41,11 @@ export class WeighableComponent extends Component
         this.scaleWeightComponent.entity?.group.add(this.tempScaleGroup);        
     }
 
+    /**
+     * Listening for entities "entitySelected" event
+     * Will move this on/off the scale if available
+     * @param eventData event data     
+     */
     onSelect(eventData: any)
     {
         if(this.isOnScale)
@@ -53,12 +60,18 @@ export class WeighableComponent extends Component
         }        
     }
 
+    /**
+     * Sets a reference to the scale that this will interact with
+     * @param swc Scale Weighing component 
+     */
     setScaleComponent(swc: ScaleWeightComponent)
     {
         this.scaleWeightComponent = swc;
     }
 
-    // Consider moving this into ScaleVisualComponent
+    /**
+     * Moves the entity to be on top of the scale with a little offset from {@link this.tempScaleGroup}
+     */
     placeOnScale()
     {                   
         this.tempScaleGroup.add(this.entity!.group);
@@ -74,6 +87,9 @@ export class WeighableComponent extends Component
         this.scaleWeightComponent.changeScaleWeight(this.weight);
     }
 
+    /**
+     * Returns the entity to it's original position
+     */
     removeFromScale()
     {
         this.scaleWeightComponent.entity?.group.remove(this.entity!.group);
@@ -85,10 +101,6 @@ export class WeighableComponent extends Component
 
         this.scaleWeightComponent.occupied = false;
         this.scaleWeightComponent.changeScaleWeight(0.0);
-    }
-
-    update(delta: number): void {
-        
     }
 
 }

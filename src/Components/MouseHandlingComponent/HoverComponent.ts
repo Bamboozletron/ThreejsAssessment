@@ -2,32 +2,38 @@ import * as THREE from 'three';
 import {Component} from '../../EntityComponent/Component';
 import { MousePointerComponent } from './MousePointerComponent'
 
-import * as ThreeHelpers from '../../Util/ThreeHelpers';
-
+/** A component to track when the entity is being hovered by the mouse */
 export class HoverComponent extends Component
 {
     // Get the general MousePointerComponent existing in the scene
-    selectableObject!: THREE.Object3D;
-    mousePointerHandler!: MousePointerComponent;
+    private selectableObject!: THREE.Object3D;
+    private mousePointerHandler!: MousePointerComponent;
     
     private isHovered: boolean = false;
-
+    
     constructor(params: any)
     {
         super();
     }
-
-    initializeEntity(): void {
+    
+    initializeEntity()
+    {
+        // Grab mousePointerHandler componoent to reference
         this.mousePointerHandler = <MousePointerComponent>this.entity?.manager.getEntity("MousePointerEntity")?.getComponent("MousePointerComponent");
     }
 
-    setSelectableObject(obj: THREE.Object3D)
+    /** Set the object to track
+     * @remarks Could possibly just default to the entity.group
+     * @param obj The reference to which object to track hovering on
+     */
+    setHoverableObject(obj: THREE.Object3D)
     {
         this.selectableObject = obj;
     }
     
-    update(delta: number): void {
-        
+    /* Broadcast hover events based on mouse interaction */
+    update(delta: number)
+    {                
         const intersect = this.mousePointerHandler.getFirstIntersection();
         if (intersect)
         {

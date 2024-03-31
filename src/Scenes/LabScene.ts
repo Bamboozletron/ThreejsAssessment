@@ -1,15 +1,19 @@
+// threejs
 import * as THREE from 'three'
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
-import StationaryOrbit from '../Camera/StationaryOrbit';
-import BaseScene from './SceneSetup/BaseScene'
-import Renderer from '../Renderer/Renderer';
+import {StationaryOrbit} from '../Camera/StationaryOrbit';
+import {BaseScene} from './SceneSetup/BaseScene'
+import {Renderer} from '../Renderer/Renderer';
 
+// Custom threejs util
 import * as ThreeHelpers from '../Util/ThreeHelpers';
 
+// Entity system
 import EntityManager from '../EntityComponent/EntityManager';
 import {Entity} from '../EntityComponent/Entity';
 
+// Components
 import {ScaleVisualComponent} from '../Components/ScaleComponents/ScaleVisualComponent';
 import {ScaleWeightComponent} from '../Components/ScaleComponents/ScaleWeightComponent';
 import {MousePointerComponent} from '../Components/MouseHandlingComponent/MousePointerComponent';
@@ -20,57 +24,61 @@ import {HoverComponent} from '../Components/MouseHandlingComponent/HoverComponen
 import {ColorChangerComponent} from '../Components/ColorChangerComponent';
 import { OutlineHoverComponent } from '../Components/OutlineHoverComponent';
 
-export default class BasicTestScene extends BaseScene
+/**
+ * A scene representing the basic lab for the assessment
+ * @remarks
+ * Uses an Entity-component framework via {@link EntityManager}
+ * 
+ * Main entities:
+ *  A lab scale, which is loaded from a GLB file and can weigh the Cube/Sphere when they're selected
+ *  Cube entity using a {@link THREE.MeshPhysicalMaterial} which changes colors when hovered over
+ *  Sphere entity using a custom materias {@link createSphereMat}.  Using "../resources/shaders/fragment-outline"   
+ */
+export class LabScene extends BaseScene
 {
-    mainCamera: any;
-    orbit: any;
+    private orbit: any;
 
-    timeElapsed: number = 0;
+    private entityManager: EntityManager;
 
-    entityManager: EntityManager;
+    private scaleGroup!: THREE.Group;
+    private scaleComponent!: ScaleWeightComponent;
 
-    scaleGroup!: THREE.Group;
-    scaleComponent!: ScaleWeightComponent;
-
-    skybox!: THREE.Texture;
-    colors: Array<THREE.Color> =
-    [
-        new THREE.Color(0xff0000),
-        new THREE.Color(0x00ff00),
-        new THREE.Color(0x0000ff),
-    ]
+    private skybox!: THREE.Texture;
 
     // Lights
-    ambientLight!: THREE.AmbientLight;
-    directionalLight!: THREE.DirectionalLight;
-    hemiLight!: THREE.HemisphereLight;
+    private ambientLight!: THREE.AmbientLight;
+    private directionalLight!: THREE.DirectionalLight;
+    private hemiLight!: THREE.HemisphereLight;
 
-    customOutlineMat!: THREE.ShaderMaterial;
+    private customOutlineMat!: THREE.ShaderMaterial;
 
+    /** Creates new LabScene */
     constructor()
     {        
         super();
         this.entityManager = new EntityManager();
     }
     
+    /** Initialize the scene, creating entities*/
     async initialize(renderer: Renderer)
-    {
+    {        
         super.initialize(renderer);
-        this.initializeBasicScene(renderer);
-
+        
+        this.initializeBasicScene(renderer); //  Could be swapped to be an entity
         this.customOutlineMat = await this.createSphereMat();
 
         // Creating entities        
         this.createMouseHandlerEntity();
         this.createScaleEntity();
-
         this.createWeightedCube();
         this.createWeightedSphere();
 
+        // Old style table setup, could be swapped to be an entity now
         this.setupTable();
     }
 
-    createMouseHandlerEntity()
+    /** Creates the entity responsible for tracking mouse movement in the scene */
+    private createMouseHandlerEntity()
     {
         const params = {
             scene: this,
@@ -78,13 +86,15 @@ export default class BasicTestScene extends BaseScene
         }
 
         const mouseEntity = new Entity();
+
         const mousePointerComponent= new MousePointerComponent(params);
         mouseEntity.addComponent(mousePointerComponent);
 
         this.entityManager.addEntity(mouseEntity, "MousePointerEntity");        
     }
 
-    createScaleEntity()
+    /** Creates entity representing the lab scale */
+    private createScaleEntity()
     {
         const params = {
             scene: this,
@@ -106,7 +116,8 @@ export default class BasicTestScene extends BaseScene
         this.add(scaleEntity.group);        
     }
 
-    createWeightedCube()
+    /** Creates entity representing the weighted cube */
+    private createWeightedCube()
     {
         const params = {
             scene: this,
@@ -117,7 +128,7 @@ export default class BasicTestScene extends BaseScene
 
         const cubeEntity = new Entity();        
 
-        // Setup component
+        // Setup components
         const geometryComponent = new BasicGeometryComponent(params);
         geometryComponent.setGeometry(box);
         geometryComponent.setMaterial(material);
@@ -127,7 +138,7 @@ export default class BasicTestScene extends BaseScene
         selectComponent.setSelectableObject(geometryComponent.mesh);
 
         const hoverComponent = new HoverComponent(params);        
-        hoverComponent.setSelectableObject(geometryComponent.mesh);
+        hoverComponent.setHoverableObject(geometryComponent.mesh);
 
         const colorChanger = new ColorChangerComponent(params);
         colorChanger.setMaterialToUpdate(material);
@@ -150,8 +161,12 @@ export default class BasicTestScene extends BaseScene
         this.add(cubeEntity.group);
     }
 
-    // Could probably collapse sphere/cube, but not 100% sure I want to yet
-    createWeightedSphere()
+    /** Creates entity representing the weighted sphere 
+     * @remarks
+     * Possibly could collapse some setup with {@link createWeightedCube}
+     * Could also probably move entity creation out to some generic factory reading from json as well
+    */
+    private createWeightedSphere()
     {
         const params = {
             scene: this,
@@ -172,7 +187,7 @@ export default class BasicTestScene extends BaseScene
         selectComponent.setSelectableObject(geometryComponent.mesh);
 
         const hoverComponent = new HoverComponent(params);        
-        hoverComponent.setSelectableObject(geometryComponent.mesh);
+        hoverComponent.setHoverableObject(geometryComponent.mesh);
 
         const outlineComponent = new OutlineHoverComponent(params);
         outlineComponent.setMaterialToUpdate(this.customOutlineMat);
@@ -196,8 +211,15 @@ export default class BasicTestScene extends BaseScene
         this.add(sphereEntity.group);
     }
 
-    // Camera/controls/skybox setup.  Could also be it's own entity now
-    initializeBasicScene(renderer: Renderer)
+    /** Creates basic scene elements
+     * @remarks
+     * Sets up:
+     * The Main camera for thes cene
+     * Orbit controls
+     * Ambient, directional, hemisphere lights
+     * Skybox
+     */
+    private initializeBasicScene(renderer: Renderer)
     {
 
         renderer.shadowMap.enabled = true;
@@ -234,12 +256,15 @@ export default class BasicTestScene extends BaseScene
         this.background = this.skybox;
     }
 
-    // Ideally table would be split out into it's own entity now, postponing that to get the actual stuff done though
-    setupTable()
+    /** Kicks off loading the table model */
+    private setupTable()
     {
         ThreeHelpers.LoadGLFT("./resources/models/table.glb", this)
     }
 
+    /** Callback for when the model is finished loading@remarks
+     * 
+     */
     modelLoaded(gltf: GLTF)
     {
         if (gltf != null)
@@ -262,11 +287,12 @@ export default class BasicTestScene extends BaseScene
         }
     }
 
-    createCubeMat()
+    /** Creates material for cube of type {@link THREE.MeshPhysicalMaterial} */
+    private createCubeMat()
     {
         const physMat = new THREE.MeshPhysicalMaterial(
             {
-                color: 0x80d1fd,
+                color: 0xFF0000,
                 transparent: true,
                 opacity: 0.35,
                 side: THREE.DoubleSide,
@@ -285,8 +311,8 @@ export default class BasicTestScene extends BaseScene
         return physMat;        
     }
 
-    // Custom shader for the sphere
-    async createSphereMat()
+    /** Creates custom matetrial for the sphere with provided shaders*/
+    private async createSphereMat()
     {
         const vsh = await fetch('./resources/shaders/vertex-outline.glsl');
         const fsh = await fetch('./resources/shaders/fragment-outline.glsl');
@@ -308,9 +334,9 @@ export default class BasicTestScene extends BaseScene
         return customMaterial;
     }
 
+    /** Update the scene*/
     update(delta: number)
     {
-        this.timeElapsed += delta;        
         this.entityManager.updateEntities(delta);
     }
     
