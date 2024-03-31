@@ -26,8 +26,7 @@ class ThreeJSAssessment
     async Initialize()
     {      
         // Create and add stats to page
-        this.stats = new Stats();
-        document.body.appendChild(this.stats.dom);
+        // this.addStatsPanel();
 
         // Create single renderer (Fullscreen)
         this.renderer = new Renderer();        
@@ -52,13 +51,19 @@ class ThreeJSAssessment
         let delta: number = t - this.previousT;
         this.previousT = t;
 
-        this.stats.update();
+        this.stats?.update();
 
         this.baseScene.Update(delta/1000); // Convert to seconds (I believe this was in MS)
         this.renderer.RenderScene();
 
         this.raf_();
       });
+    }
+
+    private addStatsPanel()
+    {
+      this.stats = new Stats();
+      document.body.appendChild(this.stats.dom);
     }
 }
 
