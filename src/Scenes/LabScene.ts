@@ -192,7 +192,7 @@ export class LabScene extends BaseScene
 
         const outlineComponent = new OutlineHoverComponent(params);
         outlineComponent.SetMaterialToUpdate(this.customOutlineMat);
-        outlineComponent.SetOutlineColor(new THREE.Color(0.9, 0.3, 0.9));
+        outlineComponent.SetOutlineColor(new THREE.Color(0.1, 0.8, 0.1));
 
         const weighableComponent = new WeighableComponent(params);
         weighableComponent.SetScaleComponent(this.scaleComponent); // I know I'm making the scale first, so just save the component above intsead of going through entity manager
@@ -322,8 +322,8 @@ export class LabScene extends BaseScene
             uniforms:
             {
                 uSelected: {value : false},
-                uOutlineColor: { value: new THREE.Vector3(0.6, 0.2, 0.2)},
-                uBaseColor: { value: new THREE.Vector3(0.3, 0.3, 0.3)},
+                uOutlineColor: { value: new THREE.Vector3(0.1, 0.8, 0.1)},
+                uBaseColor: { value: new THREE.Vector3(0.1, 0.1, 0.9)},
                 uAmbient: { value: this.ambientLight.color},
                 uDiffuseDir: { value: this.directionalLight.position.sub(this.directionalLight.target.position)},
                 uDiffuseColor: {value: this.directionalLight.color},
