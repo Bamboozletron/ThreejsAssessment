@@ -60,9 +60,9 @@ export class LabScene extends BaseScene
     }
     
     /** Initialize the scene, creating entities*/
-    async initialize(renderer: Renderer)
+    async Initialize(renderer: Renderer)
     {        
-        super.initialize(renderer);
+        super.Initialize(renderer);
         
         this.initializeBasicScene(renderer); //  Could be swapped to be an entity
         this.customOutlineMat = await this.createSphereMat();
@@ -82,15 +82,15 @@ export class LabScene extends BaseScene
     {
         const params = {
             scene: this,
-            camera: this.mainCamera,
+            camera: this.MainCamera,
         }
 
         const mouseEntity = new Entity();
 
         const mousePointerComponent= new MousePointerComponent(params);
-        mouseEntity.addComponent(mousePointerComponent);
+        mouseEntity.AddComponent(mousePointerComponent);
 
-        this.entityManager.addEntity(mouseEntity, "MousePointerEntity");        
+        this.entityManager.AddEntity(mouseEntity, "MousePointerEntity");        
     }
 
     /** Creates entity representing the lab scale */
@@ -103,17 +103,17 @@ export class LabScene extends BaseScene
         const scaleEntity = new Entity();
         const visualComponent = new ScaleVisualComponent(params);
         this.scaleComponent = new ScaleWeightComponent(params);
-        scaleEntity.addComponent(visualComponent);
-        scaleEntity.addComponent(this.scaleComponent);
+        scaleEntity.AddComponent(visualComponent);
+        scaleEntity.AddComponent(this.scaleComponent);
 
-        this.entityManager.addEntity(scaleEntity, "ScaleEntity");
+        this.entityManager.AddEntity(scaleEntity, "ScaleEntity");
 
         // Positioning scale where I want
-        scaleEntity.group.position.set(0.45, 1.03, 0.0);
-        scaleEntity.group.rotateOnAxis(new THREE.Vector3(0.0, 1.0, 0.0), -0.24);
+        scaleEntity.Group.position.set(0.45, 1.03, 0.0);
+        scaleEntity.Group.rotateOnAxis(new THREE.Vector3(0.0, 1.0, 0.0), -0.24);
 
         // Add entities group to the scene for rendering
-        this.add(scaleEntity.group);        
+        this.add(scaleEntity.Group);        
     }
 
     /** Creates entity representing the weighted cube */
@@ -121,6 +121,7 @@ export class LabScene extends BaseScene
     {
         const params = {
             scene: this,
+            castShadows: true,
         }
 
         const box = new THREE.BoxGeometry();
@@ -130,35 +131,35 @@ export class LabScene extends BaseScene
 
         // Setup components
         const geometryComponent = new BasicGeometryComponent(params);
-        geometryComponent.setGeometry(box);
-        geometryComponent.setMaterial(material);
-        geometryComponent.createMesh();
+        geometryComponent.SetGeometry(box);
+        geometryComponent.SetMaterial(material);
+        geometryComponent.CreateMesh();
 
         const selectComponent = new SelectableComponent(params);        
-        selectComponent.setSelectableObject(geometryComponent.mesh);
+        selectComponent.SetSelectableObject(geometryComponent.Mesh);
 
         const hoverComponent = new HoverComponent(params);        
-        hoverComponent.setHoverableObject(geometryComponent.mesh);
+        hoverComponent.SetHoverableObject(geometryComponent.Mesh);
 
         const colorChanger = new ColorChangerComponent(params);
-        colorChanger.setMaterialToUpdate(material);
+        colorChanger.SetMaterialToUpdate(material);
 
         const weighableComponent = new WeighableComponent(params);
-        weighableComponent.setScaleComponent(this.scaleComponent); // I know I'm making the scale first, so just save the component above intsead of going through entity manager
-        weighableComponent.weight = 567.89;
+        weighableComponent.SetScaleComponent(this.scaleComponent); // I know I'm making the scale first, so just save the component above intsead of going through entity manager
+        weighableComponent.SetWeight(567.89);
 
-        cubeEntity.addComponent(geometryComponent);
-        cubeEntity.addComponent(selectComponent);
-        cubeEntity.addComponent(hoverComponent);
-        cubeEntity.addComponent(colorChanger);
-        cubeEntity.addComponent(weighableComponent);
+        cubeEntity.AddComponent(geometryComponent);
+        cubeEntity.AddComponent(selectComponent);
+        cubeEntity.AddComponent(hoverComponent);
+        cubeEntity.AddComponent(colorChanger);
+        cubeEntity.AddComponent(weighableComponent);
 
-        cubeEntity.group.scale.set(0.25, 0.25, 0.25);
-        cubeEntity.group.position.set(0.00, 1.15, 0.0);
+        cubeEntity.Group.scale.set(0.25, 0.25, 0.25);
+        cubeEntity.Group.position.set(0.00, 1.15, 0.0);
 
-        this.entityManager.addEntity(cubeEntity, "WeightedCube");    
+        this.entityManager.AddEntity(cubeEntity, "WeightedCube");    
         
-        this.add(cubeEntity.group);
+        this.add(cubeEntity.Group);
     }
 
     /** Creates entity representing the weighted sphere 
@@ -179,36 +180,36 @@ export class LabScene extends BaseScene
 
         // Setup component
         const geometryComponent = new BasicGeometryComponent(params);
-        geometryComponent.setGeometry(sphere);
-        geometryComponent.setMaterial(this.customOutlineMat);
-        geometryComponent.createMesh();
+        geometryComponent.SetGeometry(sphere);
+        geometryComponent.SetMaterial(this.customOutlineMat);
+        geometryComponent.CreateMesh();
 
         const selectComponent = new SelectableComponent(params);        
-        selectComponent.setSelectableObject(geometryComponent.mesh);
+        selectComponent.SetSelectableObject(geometryComponent.Mesh);
 
         const hoverComponent = new HoverComponent(params);        
-        hoverComponent.setHoverableObject(geometryComponent.mesh);
+        hoverComponent.SetHoverableObject(geometryComponent.Mesh);
 
         const outlineComponent = new OutlineHoverComponent(params);
-        outlineComponent.setMaterialToUpdate(this.customOutlineMat);
-        outlineComponent.setOutlineColor(new THREE.Color(0.9, 0.3, 0.9));
+        outlineComponent.SetMaterialToUpdate(this.customOutlineMat);
+        outlineComponent.SetOutlineColor(new THREE.Color(0.9, 0.3, 0.9));
 
         const weighableComponent = new WeighableComponent(params);
-        weighableComponent.setScaleComponent(this.scaleComponent); // I know I'm making the scale first, so just save the component above intsead of going through entity manager
-        weighableComponent.weight = 123.45;
+        weighableComponent.SetScaleComponent(this.scaleComponent); // I know I'm making the scale first, so just save the component above intsead of going through entity manager
+        weighableComponent.SetWeight(123.45);
 
-        sphereEntity.addComponent(geometryComponent);
-        sphereEntity.addComponent(selectComponent);
-        sphereEntity.addComponent(hoverComponent);
-        sphereEntity.addComponent(outlineComponent);
-        sphereEntity.addComponent(weighableComponent);
+        sphereEntity.AddComponent(geometryComponent);
+        sphereEntity.AddComponent(selectComponent);
+        sphereEntity.AddComponent(hoverComponent);
+        sphereEntity.AddComponent(outlineComponent);
+        sphereEntity.AddComponent(weighableComponent);
 
-        sphereEntity.group.scale.set(0.25, 0.25, 0.25);
-        sphereEntity.group.position.set(-0.5, 1.2, 0.0);
+        sphereEntity.Group.scale.set(0.25, 0.25, 0.25);
+        sphereEntity.Group.position.set(-0.5, 1.2, 0.0);
 
-        this.entityManager.addEntity(sphereEntity, "WeightedSphere");    
+        this.entityManager.AddEntity(sphereEntity, "WeightedSphere");    
         
-        this.add(sphereEntity.group);
+        this.add(sphereEntity.Group);
     }
 
     /** Creates basic scene elements
@@ -226,10 +227,10 @@ export class LabScene extends BaseScene
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
         // Create basic scene
-        this.mainCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100.0);
-        this.mainCamera.position.set(0,1.6,1.2);
+        this.MainCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100.0);
+        this.MainCamera.position.set(0,1.6,1.2);
 
-        this.orbit = new StationaryOrbit(this.mainCamera, renderer.domElement);
+        this.orbit = new StationaryOrbit(this.MainCamera, renderer.domElement);
         this.orbit.target.set(0, 1, -2);
         this.orbit.update();
 
@@ -265,7 +266,7 @@ export class LabScene extends BaseScene
     /** Callback for when the model is finished loading@remarks
      * 
      */
-    modelLoaded(gltf: GLTF)
+    ModelLoaded(gltf: GLTF)
     {
         if (gltf != null)
         {
@@ -335,9 +336,9 @@ export class LabScene extends BaseScene
     }
 
     /** Update the scene*/
-    update(delta: number)
+    Update(delta: number)
     {
-        this.entityManager.updateEntities(delta);
+        this.entityManager.UpdateEntities(delta);
     }
     
     

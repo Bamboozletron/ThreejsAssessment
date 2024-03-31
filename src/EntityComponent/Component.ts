@@ -4,23 +4,23 @@ import {Entity} from '../EntityComponent/Entity'
 export class Component
 {
     /** Entity that this component belongs to */
-    entity!: Entity;    
+    Entity!: Entity;    
 
     /** Called on Entity initialization (When entity is added via {@link EntityManager.addComponent}*/
-    initializeEntity(){};
+    InitializeEntity(){};
 
     /** Called when Component is added to the entity */
-    initializeComponent(){};
+    InitializeComponent(){};
     
     /** Add an event handler to the component
      * @param name Name of event to listen to
      * @param fn function callback
      */
-    addEventHandler(name: string, fn: Function)
+    AddEventHandler(name: string, fn: Function)
     {
-        this.entity?.addEventHandler(name, fn);
+        this.Entity?.AddEventHandler(name, fn);
     }
     
-    update(delta: number){};
+    Update(delta: number){};
     
 }

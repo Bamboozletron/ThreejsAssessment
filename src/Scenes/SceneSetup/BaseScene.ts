@@ -9,20 +9,20 @@ import {Renderer} from '../../Renderer/Renderer';
 export abstract class BaseScene extends THREE.Scene
 {
     /** Get/set the main {@link THREE.Camera} for the scene*/
-    mainCamera: THREE.Camera;
+    MainCamera: THREE.Camera;
     
     /** Creates new BaseScene */
     constructor()
     {
         super();
-        this.mainCamera = new THREE.PerspectiveCamera(70, 1920.0 / 1080.0, 0.1, 100); // Default camera, mostly to ensure it has one
+        this.MainCamera = new THREE.PerspectiveCamera(70, 1920.0 / 1080.0, 0.1, 100); // Default camera, mostly to ensure it has one
     }
 
-    async initialize(renderer: Renderer)
+    async Initialize(renderer: Renderer)
     {        
     }
     
-    update(delta: number)
+    Update(delta: number)
     {        
     }
 }

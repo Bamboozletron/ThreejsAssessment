@@ -15,16 +15,16 @@ export class OutlineHoverComponent extends Component
         super();
     }
     
-    initializeEntity(): void {
-        this.addEventHandler("entityHoverStart", (eventData: any) => this.hoverStart(eventData));
-        this.addEventHandler("entityHoverEnd", (eventData: any) => this.hoverEnd(eventData));
+    InitializeEntity(): void {
+        this.AddEventHandler("entityHoverStart", (eventData: any) => this.hoverStart(eventData));
+        this.AddEventHandler("entityHoverEnd", (eventData: any) => this.hoverEnd(eventData));
     }
 
     /**
      * Set the material to adjust when hovered
      * @param mat provided material
      */
-    setMaterialToUpdate(mat: THREE.ShaderMaterial)
+    SetMaterialToUpdate(mat: THREE.ShaderMaterial)
     {
         this.material = mat;
     }
@@ -33,7 +33,7 @@ export class OutlineHoverComponent extends Component
      * Set the outline color
      * @param color Outline color 
      */
-    setOutlineColor(color: THREE.Color)
+    SetOutlineColor(color: THREE.Color)
     {
         if (this.material)
         {
@@ -44,7 +44,7 @@ export class OutlineHoverComponent extends Component
     /**
      * Respond to "entityHoverStart" event
      */
-    hoverStart(data: any)
+    private hoverStart(data: any)
     {
         if (this.material)
         {
@@ -55,7 +55,7 @@ export class OutlineHoverComponent extends Component
     /**
      * Respond to "entityHoverEnd" event
      */
-    hoverEnd(data: any)
+    private hoverEnd(data: any)
     {
         if (this.material)
         {

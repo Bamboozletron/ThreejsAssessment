@@ -18,16 +18,16 @@ export class ColorChangerComponent extends Component
         super();
     }
     
-    initializeEntity(): void {
-        this.addEventHandler("entityHoverStart", (eventData: any) => this.hoverStart(eventData));
-        this.addEventHandler("entityHoverEnd", (eventData: any) => this.hoverEnd(eventData));
+    InitializeEntity(): void {
+        this.AddEventHandler("entityHoverStart", (eventData: any) => this.hoverStart(eventData));
+        this.AddEventHandler("entityHoverEnd", (eventData: any) => this.hoverEnd(eventData));
     }
 
     /**
      * Sets the material that this component should change
      * @param mat provided material
      */
-    setMaterialToUpdate(mat: THREE.MeshPhysicalMaterial)
+    SetMaterialToUpdate(mat: THREE.MeshPhysicalMaterial)
     {
         this.material = mat;
     }
@@ -35,7 +35,7 @@ export class ColorChangerComponent extends Component
     /**
      * Respond to "entityHoverStart" event
      */
-    hoverStart(data: any)
+    private hoverStart(data: any)
     {
         this.isHovered = true;
     }
@@ -43,7 +43,7 @@ export class ColorChangerComponent extends Component
     /**
      * Respond to "entityHoverEnd" event
      */
-    hoverEnd(data: any)
+    private hoverEnd(data: any)
     {
         this.isHovered = false;
     }
@@ -51,7 +51,7 @@ export class ColorChangerComponent extends Component
     /**
      * If hovered, cycle through hues
      */
-    update(delta: number): void {
+    Update(delta: number): void {
         
         if (this.material)
         {

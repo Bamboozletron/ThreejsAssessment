@@ -9,7 +9,7 @@ export class BasicGeometryComponent extends Component
     private geometry!: THREE.BufferGeometry
     private mat!: THREE.Material;    
 
-    mesh!: THREE.Mesh;
+    Mesh!: THREE.Mesh;
 
     private castShadows: boolean = false;
 
@@ -20,16 +20,16 @@ export class BasicGeometryComponent extends Component
         this.castShadows = this.params.castShadows;    
     }    
 
-    initializeEntity()
+    InitializeEntity()
     {        
-        this.entity?.group.add(this.mesh);
+        this.Entity?.Group.add(this.Mesh);
     }
 
     /**
      * Sets the generated geometry for this component
      * @param geometry Supplied buffer geometry
      */
-    setGeometry(geometry: THREE.BufferGeometry)
+    SetGeometry(geometry: THREE.BufferGeometry)
     {
         this.geometry = geometry;
     }
@@ -38,7 +38,7 @@ export class BasicGeometryComponent extends Component
      * Sets the material for this entity
      * @param material supplied material
      */
-    setMaterial(material: THREE.Material)
+    SetMaterial(material: THREE.Material)
     {
         this.mat = material;
     }
@@ -48,10 +48,10 @@ export class BasicGeometryComponent extends Component
      * @remarks
      * Must be called after setGeometry/setMesh which isn't ideal
      */
-    createMesh()
+    CreateMesh()
     {
-        this.mesh = new THREE.Mesh(this.geometry, this.mat);
-        this.mesh.castShadow = true;
+        this.Mesh = new THREE.Mesh(this.geometry, this.mat);
+        this.Mesh.castShadow = this.castShadows;
     }
 }
 

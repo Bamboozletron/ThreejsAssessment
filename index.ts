@@ -23,7 +23,7 @@ class ThreeJSAssessment
 
 
     /** Initialize the application*/
-    async initialize()
+    async Initialize()
     {      
         // Create and add stats to page
         this.stats = new Stats();
@@ -31,13 +31,13 @@ class ThreeJSAssessment
 
         // Create single renderer (Fullscreen)
         this.renderer = new Renderer();        
-        this.renderer.initialize();
+        this.renderer.Initialize();
         document.body.appendChild(this.renderer.domElement);            
 
         // Wait for scene to setup
-        await this.baseScene.initialize(this.renderer);
+        await this.baseScene.Initialize(this.renderer);
 
-        this.renderer.setScene(this.baseScene);   
+        this.renderer.SetScene(this.baseScene);   
         this.renderer.setClearColor(0x999999, 1.0);
 
         // Start game loop        
@@ -54,8 +54,8 @@ class ThreeJSAssessment
 
         this.stats.update();
 
-        this.baseScene.update(delta/1000); // Convert to seconds (I believe this was in MS)
-        this.renderer.renderScene();
+        this.baseScene.Update(delta/1000); // Convert to seconds (I believe this was in MS)
+        this.renderer.RenderScene();
 
         this.raf_();
       });
@@ -64,4 +64,4 @@ class ThreeJSAssessment
 
 // Setup
 let TestApp = new ThreeJSAssessment();
-TestApp.initialize();
+TestApp.Initialize();

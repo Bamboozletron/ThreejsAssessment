@@ -14,23 +14,23 @@ export default class EntityManager
      * @param entity Entity to add
      * @param name Required name
      * @remarks
-     * This is what initializes triggers Entity initialization. {@link Entity.initialize}
+     * This is what initializes triggers Entity initialization. {@link Entity.Initialize}
      */
-    addEntity(entity: Entity, name: string)
+    AddEntity(entity: Entity, name: string)
     {
-        entity.name = name;        
-        entity.manager = this;
+        entity.Name = name;        
+        entity.Manager = this;
 
         this.entities.push(entity);        
-        entity.initialize();
+        entity.Initialize();
     }
 
     /** Get an entity based on name */
-    getEntity(name: string)
+    GetEntity(name: string)
     {
         for (var k in this.entities)
         {
-            if (this.entities[k].name == name)
+            if (this.entities[k].Name == name)
             {
                 return this.entities[k];
             }
@@ -41,7 +41,7 @@ export default class EntityManager
     /** UNTESTED Remove an entity 
      * @remarks Similar to Component, didn't quite need this so it's a bit behind and untested. Should probably be part of the overhaul to a map and remove based on name
     */
-    removeEntity(entity: Entity)
+    RemoveEntity(entity: Entity)
     {
         const index = this.entities.indexOf(entity);
         if (index >= 0)
@@ -50,11 +50,11 @@ export default class EntityManager
         }
     }
 
-    updateEntities(delta: number)
+    UpdateEntities(delta: number)
     {
         for(var k in this.entities)
         {
-            this.entities[k].updateComponents(delta);
+            this.entities[k].UpdateComponents(delta);
         }    
     }
 }

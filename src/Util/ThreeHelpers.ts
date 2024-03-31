@@ -11,7 +11,7 @@ export function LoadGLFT(modelPath: string, object: any)
     const loader = new GLTFLoader();
     loader.load(modelPath, function (gltf)
     {            
-        object.modelLoaded(gltf);
+        object.ModelLoaded(gltf);
     }, undefined, function(error)
     {
         console.log(error);

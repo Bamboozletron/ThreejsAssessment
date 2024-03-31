@@ -38,7 +38,7 @@ export class ScaleVisualComponent extends Component
         this.scaleGroup = new THREE.Group();
      };
 
-    initializeEntity()
+    InitializeEntity()
     {
         this.setupTextPlaneAndScreenMat();
         this.loadBasicScaleMats();
@@ -63,7 +63,7 @@ export class ScaleVisualComponent extends Component
      * Callback for when the model is finished loading
      * @param gltf the loaded model
      */
-    modelLoaded(gltf: GLTF)
+    ModelLoaded(gltf: GLTF)
     {        
         var model = gltf.scene;
         let meshArray = new Array<THREE.Object3D>();
@@ -120,7 +120,7 @@ export class ScaleVisualComponent extends Component
 
         this.scaleGroup.scale.set(0.8, 0.8, 0.8);
 
-        this.entity?.group.add(this.scaleGroup);
+        this.Entity?.Group.add(this.scaleGroup);
     }
 
     /**
@@ -166,7 +166,7 @@ export class ScaleVisualComponent extends Component
      * @remarks
      * Seems like it has to be refilled every time otherwise it just painted over the old texture
      */
-    setScaleWeightTexture(targetWeight: string)
+    SetScaleWeightTexture(targetWeight: string)
     {
         if (this.canvasContext)
         {
@@ -181,9 +181,5 @@ export class ScaleVisualComponent extends Component
             this.canvasContext.fillText(targetWeight, this.canvasWidth/2, this.canvasHeight/2);
         }
         this.canvasTexture.needsUpdate = true;
-    }
-
-    update(delta: number)
-    {
     }
 }

@@ -16,7 +16,7 @@ export class Renderer extends THREE.WebGLRenderer
     }
     
     /** Initialize renderer */
-    initialize()
+    Initialize()
     {        
         // Listen for window resize
         window.addEventListener('resize', () =>
@@ -28,7 +28,7 @@ export class Renderer extends THREE.WebGLRenderer
     }
 
     /** Set which scene for the renderer to render */
-    setScene(scene: BaseScene)
+    SetScene(scene: BaseScene)
     {
         this.activeScene = scene;
     }
@@ -37,21 +37,21 @@ export class Renderer extends THREE.WebGLRenderer
      * @remarks
      * Assumes scenes only have one "main" camera right now to render to view.
      */
-    renderScene()
+    RenderScene()
     {
-        this.render(this.activeScene as THREE.Object3D, this.activeScene.mainCamera as THREE.Camera);        
+        this.render(this.activeScene as THREE.Object3D, this.activeScene.MainCamera as THREE.Camera);        
     }
 
     /** Window resize event, adjust renderer size and adjust the camera if it's a {@link THREE.PerspectiveCamera} */
-    onWindowResize()
+    private onWindowResize()
     {
         this.setSize(window.innerWidth, window.innerHeight);    
 
         if (this.activeScene)
         {
-            if (this.activeScene.mainCamera instanceof THREE.PerspectiveCamera)
+            if (this.activeScene.MainCamera instanceof THREE.PerspectiveCamera)
             {
-                let perspectiveCamera: THREE.PerspectiveCamera = this.activeScene.mainCamera;
+                let perspectiveCamera: THREE.PerspectiveCamera = this.activeScene.MainCamera;
                 perspectiveCamera.aspect = window.innerWidth / window.innerHeight;        
                 perspectiveCamera.updateProjectionMatrix();
             }

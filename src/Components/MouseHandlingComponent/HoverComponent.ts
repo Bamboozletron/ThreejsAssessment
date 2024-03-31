@@ -16,25 +16,25 @@ export class HoverComponent extends Component
         super();
     }
     
-    initializeEntity()
+    InitializeEntity()
     {
         // Grab mousePointerHandler componoent to reference
-        this.mousePointerHandler = <MousePointerComponent>this.entity?.manager.getEntity("MousePointerEntity")?.getComponent("MousePointerComponent");
+        this.mousePointerHandler = <MousePointerComponent>this.Entity?.Manager.GetEntity("MousePointerEntity")?.GetComponent("MousePointerComponent");
     }
 
     /** Set the object to track
      * @remarks Could possibly just default to the entity.group
      * @param obj The reference to which object to track hovering on
      */
-    setHoverableObject(obj: THREE.Object3D)
+    SetHoverableObject(obj: THREE.Object3D)
     {
         this.selectableObject = obj;
     }
     
     /* Broadcast hover events based on mouse interaction */
-    update(delta: number)
+    Update(delta: number)
     {                
-        const intersect = this.mousePointerHandler.getFirstIntersection();
+        const intersect = this.mousePointerHandler.GetFirstIntersection();
         if (intersect)
         {
             if (intersect == this.selectableObject)
@@ -42,7 +42,7 @@ export class HoverComponent extends Component
                 if (!this.isHovered)
                 {  
                     this.isHovered = true;
-                    this.entity?.broadcastEvent(
+                    this.Entity?.BroadcastEvent(
                         {
                             eventName: "entityHoverStart",         
                         }
@@ -52,7 +52,7 @@ export class HoverComponent extends Component
             else if (this.isHovered)
             {
                 this.isHovered = false;
-                this.entity?.broadcastEvent(
+                this.Entity?.BroadcastEvent(
                     {
                         eventName: "entityHoverEnd",         
                     }
@@ -64,7 +64,7 @@ export class HoverComponent extends Component
             if (this.isHovered)
             {
                 this.isHovered = false;
-                this.entity?.broadcastEvent(
+                this.Entity?.BroadcastEvent(
                     {
                         eventName: "entityHoverEnd",         
                     }

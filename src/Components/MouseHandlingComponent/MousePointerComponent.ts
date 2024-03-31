@@ -10,40 +10,27 @@ export class MousePointerComponent extends Component
 
     private intersections!: THREE.Intersection<THREE.Object3D<THREE.Object3DEventMap>>[];
 
-    raycaster!: THREE.Raycaster;    
-    pointerPos: THREE.Vector2;
+    Raycaster!: THREE.Raycaster;    
+    PointerPos: THREE.Vector2;
 
     constructor(params: any)
     {
         super();
         this.params = params;
-        this.pointerPos = new THREE.Vector2();
+        this.PointerPos = new THREE.Vector2();
     }
 
-    initializeComponent(): void {
+    InitializeComponent(): void {
         window.addEventListener('mousemove', (event) =>
         {
             this.onMouseMove(event);
         }, false);
 
-        this.raycaster = new THREE.Raycaster();
-    }
-
-    /** Sets intersections and pointerposition from the mouse event
-     * @param event mouse event data
-     */
-    onMouseMove(event: MouseEvent)
-    {
-        this.pointerPos.x = (event.clientX/window.innerWidth) * 2 - 1;
-        this.pointerPos.y = -((event.clientY/window.innerHeight) * 2 - 1);
-
-        this.raycaster.setFromCamera(this.pointerPos, this.params.camera);
-
-        this.intersections = this.raycaster.intersectObjects(this.params.scene.children);
+        this.Raycaster = new THREE.Raycaster();
     }
 
     /** Get the current first intersection of this component */
-    getFirstIntersection(): THREE.Object3D | null
+    GetFirstIntersection(): THREE.Object3D | null
     {
         if (this.intersections)
         {
@@ -54,5 +41,18 @@ export class MousePointerComponent extends Component
         }
 
         return null;
+    }
+
+    /** Sets intersections and pointerposition from the mouse event
+     * @param event mouse event data
+     */
+    private onMouseMove(event: MouseEvent)
+    {
+        this.PointerPos.x = (event.clientX/window.innerWidth) * 2 - 1;
+        this.PointerPos.y = -((event.clientY/window.innerHeight) * 2 - 1);
+
+        this.Raycaster.setFromCamera(this.PointerPos, this.params.camera);
+
+        this.intersections = this.Raycaster.intersectObjects(this.params.scene.children);
     }
 }

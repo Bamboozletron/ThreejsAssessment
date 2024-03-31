@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import {Component} from '../../EntityComponent/Component';
 import { ScaleVisualComponent } from './ScaleVisualComponent';
-import { MousePointerComponent } from '../MouseHandlingComponent/MousePointerComponent';
 
 /**
  * Component to track weight on the scale
@@ -23,7 +22,7 @@ export class ScaleWeightComponent extends Component
 
         private visualComponent!: ScaleVisualComponent | null; 
 
-        occupied: boolean = false;
+        Occupied: boolean = false;
 
         constructor(params: any)
         {
@@ -31,16 +30,16 @@ export class ScaleWeightComponent extends Component
             this.params = params;
         }
 
-        initializeEntity() 
+        InitializeEntity() 
         {
-            this.visualComponent = <ScaleVisualComponent>this.entity?.getComponent("ScaleVisualComponent");
+            this.visualComponent = <ScaleVisualComponent>this.Entity?.GetComponent("ScaleVisualComponent");
         }
 
         /**
          * Set new target for scale weight to lerp to
          * @param targetWeight target weight
          */
-        changeScaleWeight(targetWeight: number)
+        ChangeScaleWeight(targetWeight: number)
         {        
             this.timeProgress = 0.0;
             this.targetWeight = targetWeight;    
@@ -53,7 +52,7 @@ export class ScaleWeightComponent extends Component
          * @param weight weight as number
          * @returns weight as formatted string
          */
-        formatWeight(weight: number): string
+        private formatWeight(weight: number): string
         {        
             var weightString = weight.toFixed(2) + "g";
             const length = weightString.length;
@@ -72,13 +71,13 @@ export class ScaleWeightComponent extends Component
         /**
          * Split into it's own function because I was going to mess with some different functions to lerp with but haven't come back to it
          */
-        interpolateWeight(start: number, end: number, progress: number): number
+        private interpolateWeight(start: number, end: number, progress: number): number
         {
             return THREE.MathUtils.lerp(start, end, progress);        
         }
 
         
-        update(delta: number)        
+        Update(delta: number)        
         {
             // Lerp to target weight while setting the visual on the scale            
             if (this.changingWeight)
@@ -88,7 +87,7 @@ export class ScaleWeightComponent extends Component
                     this.currentWeight = this.interpolateWeight(this.beginningWeight, this.targetWeight, this.timeProgress/this.timeToChange);
                     this.timeProgress+= delta;            
         
-                    this.visualComponent?.setScaleWeightTexture(this.formatWeight(this.currentWeight));
+                    this.visualComponent?.SetScaleWeightTexture(this.formatWeight(this.currentWeight));
                 }
                 else
                 {
@@ -96,7 +95,7 @@ export class ScaleWeightComponent extends Component
                     this.timeProgress = 0;
                     this.currentWeight = this.targetWeight;
         
-                    this.visualComponent?.setScaleWeightTexture(this.formatWeight(this.currentWeight));
+                    this.visualComponent?.SetScaleWeightTexture(this.formatWeight(this.currentWeight));
                 }
             }
         }

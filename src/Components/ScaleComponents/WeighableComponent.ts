@@ -9,8 +9,8 @@ export class WeighableComponent extends Component
 {
     private params: any;
 
-    isOnScale: boolean = false;
-    weight: number = 423.0;
+    private isOnScale: boolean = false;
+    private weight: number = 423.0;
 
     private tempScaleGroup: THREE.Group = new THREE.Group();
 
@@ -26,19 +26,19 @@ export class WeighableComponent extends Component
         this.params = params;
     }
 
-    initializeEntity(): void {
-        this.addEventHandler("entitySelected", (eventData: any) => this.onSelect(eventData));
+    InitializeEntity(): void {
+        this.AddEventHandler("entitySelected", (eventData: any) => this.onSelect(eventData));
 
         // Save the original positoin of this (Should move to PlaceOnScale if they ever can move before going on the scale)
-        if (this.entity)
+        if (this.Entity)
         {
-            this.originalPos = this.entity.group.position.clone();
-            this.originalScale = this.entity.group.scale.clone();
-            this.originalRot = this.entity.group.rotation.clone();
+            this.originalPos = this.Entity.Group.position.clone();
+            this.originalScale = this.Entity.Group.scale.clone();
+            this.originalRot = this.Entity.Group.rotation.clone();
         }
 
         this.tempScaleGroup.position.set(0,0.105,0);
-        this.scaleWeightComponent.entity?.group.add(this.tempScaleGroup);        
+        this.scaleWeightComponent.Entity?.Group.add(this.tempScaleGroup);        
     }
 
     /**
@@ -46,14 +46,14 @@ export class WeighableComponent extends Component
      * Will move this on/off the scale if available
      * @param eventData event data     
      */
-    onSelect(eventData: any)
+    private onSelect(eventData: any)
     {
         if(this.isOnScale)
         {   
             this.removeFromScale(); 
             this.isOnScale = false;        
         }
-        else if (!this.scaleWeightComponent.occupied)        
+        else if (!this.scaleWeightComponent.Occupied)        
         {            
             this.placeOnScale();
             this.isOnScale = true;
@@ -61,10 +61,19 @@ export class WeighableComponent extends Component
     }
 
     /**
+     * Sets entity weight
+     * @param weight entity weight
+     */
+    SetWeight(weight: number)
+    {
+        this.weight = weight;
+    }
+
+    /**
      * Sets a reference to the scale that this will interact with
      * @param swc Scale Weighing component 
      */
-    setScaleComponent(swc: ScaleWeightComponent)
+    SetScaleComponent(swc: ScaleWeightComponent)
     {
         this.scaleWeightComponent = swc;
     }
@@ -72,35 +81,35 @@ export class WeighableComponent extends Component
     /**
      * Moves the entity to be on top of the scale with a little offset from {@link this.tempScaleGroup}
      */
-    placeOnScale()
+    private placeOnScale()
     {                   
-        this.tempScaleGroup.add(this.entity!.group);
+        this.tempScaleGroup.add(this.Entity!.Group);
 
         // Adjust positioning        
-        this.entity!.group.rotation.set(0,0,0);
+        this.Entity!.Group.rotation.set(0,0,0);
 
         const box = new THREE.Box3().setFromObject(this.tempScaleGroup);
-        this.entity!.group.position.set(0, (box.max.y - box.min.y)/2, 0);
+        this.Entity!.Group.position.set(0, (box.max.y - box.min.y)/2, 0);
 
 
-        this.scaleWeightComponent.occupied = true;
-        this.scaleWeightComponent.changeScaleWeight(this.weight);
+        this.scaleWeightComponent.Occupied = true;
+        this.scaleWeightComponent.ChangeScaleWeight(this.weight);
     }
 
     /**
      * Returns the entity to it's original position
      */
-    removeFromScale()
+    private removeFromScale()
     {
-        this.scaleWeightComponent.entity?.group.remove(this.entity!.group);
-        this.params.scene.add(this.entity!.group); // Have to re-add this entities group to the scene when removing from other group
+        this.scaleWeightComponent.Entity?.Group.remove(this.Entity!.Group);
+        this.params.scene.add(this.Entity!.Group); // Have to re-add this entities group to the scene when removing from other group
 
-        this.entity!.group.position.set(this.originalPos.x, this.originalPos.y, this.originalPos.z);
-        this.entity!.group.rotation.set(this.originalRot.x, this.originalRot.y, this.originalRot.z);
-        this.entity!.group.scale.set(this.originalScale.x, this.originalScale.y, this.originalScale.z);
+        this.Entity!.Group.position.set(this.originalPos.x, this.originalPos.y, this.originalPos.z);
+        this.Entity!.Group.rotation.set(this.originalRot.x, this.originalRot.y, this.originalRot.z);
+        this.Entity!.Group.scale.set(this.originalScale.x, this.originalScale.y, this.originalScale.z);
 
-        this.scaleWeightComponent.occupied = false;
-        this.scaleWeightComponent.changeScaleWeight(0.0);
+        this.scaleWeightComponent.Occupied = false;
+        this.scaleWeightComponent.ChangeScaleWeight(0.0);
     }
 
 }

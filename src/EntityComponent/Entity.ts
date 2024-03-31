@@ -9,12 +9,12 @@ import EntityManager from './EntityManager';
 */
 export class Entity
 {
-    name: string = "";       
+    Name: string = "";       
 
     // Possibly a weird idea. Each Entity has a top level "Group" from threejs for positioning
     // Let components handle more complicated entity setup for now (ie, no heirarchy for entities yet)
-    group: THREE.Group;
-    manager!: EntityManager;
+    Group: THREE.Group;
+    Manager!: EntityManager;
 
     private eventHandlers: Map<string, Array<Function>> = new Map<string, Array<Function>>();
     private components: Array<Component>;
@@ -26,25 +26,25 @@ export class Entity
     constructor()
     {     
         this.components = new Array<Component>();
-        this.group = new THREE.Group();
+        this.Group = new THREE.Group();
     }
 
     /** Add a component to the entity
      * @remarks
-     * {@link Component.initializeComponent} called from here
+     * {@link Component.InitializeComponent} called from here
     */
-    addComponent(component: Component)
+    AddComponent(component: Component)
     {        
         this.components.push(component);
-        component.initializeComponent();
-        component.entity = this;
+        component.InitializeComponent();
+        component.Entity = this;
     }
 
     /** Remove a component from the entity
      * @remarks
      * Honestly untested in the current application because it wasn't really necessary.  
     */
-    removeComponent(component: Component)
+    RemoveComponent(component: Component)
     {
         const index = this.components.indexOf(component);
         if (index >= 0)
@@ -54,7 +54,7 @@ export class Entity
     }
 
     /** Get a specific component from the entity based on type name */
-    getComponent(type: string): Component | null
+    GetComponent(type: string): Component | null
     {
         for (var k in this.components)
         {            
@@ -70,22 +70,22 @@ export class Entity
 
     /** Initialize the entity.
     *  @remarks 
-    * Called from {@link EntityManager.addEntity}
-    * Happens AFTER {@link Component.initializeComponent}
+    * Called from {@link EntityManager.AddEntity}
+    * Happens AFTER {@link Component.InitializeComponent}
     */
-    initialize()
+    Initialize()
     {
         for(var k in this.components)
         {
-            this.components[k].initializeEntity();            
+            this.components[k].InitializeEntity();            
         }
     }
 
-    updateComponents(delta: number)
+    UpdateComponents(delta: number)
     {
         for(var k in this.components)
         {
-            this.components[k].update(delta);
+            this.components[k].Update(delta);
         }
     }
 
@@ -93,7 +93,7 @@ export class Entity
      * @param name Name of event to listen to
      * @param fn function callback
     */
-    addEventHandler(name: string, fn: Function)
+    AddEventHandler(name: string, fn: Function)
     {
         if (!this.eventHandlers.has(name))
         {
@@ -110,7 +110,7 @@ export class Entity
     /** Broadcast an event across the entity
      * @param eventData Contains all event data, including an eventName
     */
-    broadcastEvent(eventData: any)
+    BroadcastEvent(eventData: any)
     {
         // Probably a better way to collapse a has/get to be one call
         if (this.eventHandlers.has(eventData.eventName))

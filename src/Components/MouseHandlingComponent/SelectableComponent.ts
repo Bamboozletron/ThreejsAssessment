@@ -7,28 +7,28 @@ export class SelectableComponent extends Component
 {
     // Get the general MousePointerComponent existing in the scene
     private selectableObject!: THREE.Object3D;
-    mousePointerHandler!: MousePointerComponent;    
+    private mousePointerHandler!: MousePointerComponent;    
 
     constructor(params: any)
     {
         super();
     }
 
-    initializeComponent(): void {
+    InitializeComponent(): void {
         document.addEventListener('mouseup', (eventData) => {
             this.onMouseUp(eventData);
         }, false);;   
     }
 
-    initializeEntity(): void {
-        this.mousePointerHandler = <MousePointerComponent>this.entity?.manager.getEntity("MousePointerEntity")?.getComponent("MousePointerComponent");
+    InitializeEntity(): void {
+        this.mousePointerHandler = <MousePointerComponent>this.Entity?.Manager.GetEntity("MousePointerEntity")?.GetComponent("MousePointerComponent");
     }
 
     /** Set the object to track
      * @remarks Could possibly just default to the entity.group
      * @param obj The reference to which object to track selection on
      */
-    setSelectableObject(obj: THREE.Object3D)
+    SetSelectableObject(obj: THREE.Object3D)
     {
         this.selectableObject = obj;
     }
@@ -36,12 +36,12 @@ export class SelectableComponent extends Component
     /**Broadcast entitySelected event if the selected object is intersected
      * @param eventData mouse event data
      */
-    onMouseUp(eventData: MouseEvent)
+    private onMouseUp(eventData: MouseEvent)
     {
-        const intersections = this.mousePointerHandler.raycaster.intersectObject(this.entity!.group, true);
+        const intersections = this.mousePointerHandler.Raycaster.intersectObject(this.Entity!.Group, true);
         if (intersections.length > 0)
         {
-            this.entity?.broadcastEvent(
+            this.Entity?.BroadcastEvent(
                 {
                     eventName: "entitySelected",
                 }
