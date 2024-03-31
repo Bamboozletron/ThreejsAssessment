@@ -12,6 +12,11 @@
 3. `npx vite` (Default port is 5173)
 4. Use provided launch.json "Launch Chrome against Localhost" option
 
+Example:
+
+https://github.com/Bamboozletron/ThreejsAssessment/assets/163564902/d1a262b3-652e-41d2-9e9d-fcfc9caee7cf
+
+
 ## Basic Scene Setup
 Bulk of the work is done in [LabScene.ts](https://github.com/Bamboozletron/ThreejsAssessment/blob/main/src/Scenes/LabScene.ts) which sets up the scene lights / camera / controls.
 
