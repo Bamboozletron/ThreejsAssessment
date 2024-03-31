@@ -69,6 +69,7 @@ export class ScaleVisualComponent extends Component
             if (o instanceof THREE.Mesh)
             {
                 meshArray.push(o);
+                o.receiveShadow = true;                
             }
         })
 

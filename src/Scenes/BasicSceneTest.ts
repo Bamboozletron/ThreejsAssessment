@@ -155,6 +155,7 @@ export default class BasicTestScene extends BaseScene
     {
         const params = {
             scene: this,
+            castShadows: true,
         }
 
         const sphere = new THREE.SphereGeometry(0.5, 16, 16);
@@ -198,6 +199,10 @@ export default class BasicTestScene extends BaseScene
     // Camera/controls/skybox setup.  Could also be it's own entity now
     initializeBasicScene(renderer: Renderer)
     {
+
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
         // Create basic scene
         this.mainCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100.0);
         this.mainCamera.position.set(0,1.6,1.2);
@@ -206,14 +211,13 @@ export default class BasicTestScene extends BaseScene
         this.orbit.target.set(0, 1, -2);
         this.orbit.update();
 
-        this.ambientLight = new THREE.AmbientLight(0x808080, 0.4);
+        this.ambientLight = new THREE.AmbientLight(0x808080, 0.0);
         this.add(this.ambientLight);
 
-
-        this.hemiLight = new THREE.HemisphereLight(0xB1E1FF, 0xB97A20, 0.5);
+        this.hemiLight = new THREE.HemisphereLight(0xB1E1FF, 0xB97A20, 0.6);
         this.add(this.hemiLight);
 
-        this.directionalLight = new THREE.DirectionalLight(0xCCCCCC, 0.5);
+        this.directionalLight = new THREE.DirectionalLight(0xFFFFFF, 0.3);
         this.directionalLight.position.set(-3.0, 4.0, 1.0);        
         this.directionalLight.castShadow = true;
         this.add(this.directionalLight);
@@ -249,9 +253,11 @@ export default class BasicTestScene extends BaseScene
                 if (o instanceof THREE.Mesh)
                 {                    
                   o.material = tableMat;
+                  o.receiveShadow = true;
                 }
             })
 
+            gltf.scene.receiveShadow = true;
             this.add(gltf!.scene);
         }
     }

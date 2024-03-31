@@ -10,10 +10,13 @@ export class BasicGeometryComponent extends Component
     mesh!: THREE.Mesh;
     mat!: THREE.Material;    
 
+    castShadows: boolean = false;
+
     constructor(params: any)
     {
         super();
         this.params = params;
+        this.castShadows = this.params.castShadows;
     }
 
     initializeEntity()
@@ -28,12 +31,13 @@ export class BasicGeometryComponent extends Component
 
     setMaterial(material: THREE.Material)
     {
-        this.mat = material;        
+        this.mat = material;
     }
 
     createMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.mat);
+        this.mesh.castShadow = true;
     }
 }
 
