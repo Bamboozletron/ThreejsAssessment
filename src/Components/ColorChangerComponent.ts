@@ -5,7 +5,6 @@ import * as ThreeHelpers from '../Util/ThreeHelpers';
 
 export class ColorChangerComponent extends Component
 {
-    // Get the general MousePointerComponent existing in the scene
     private material!: THREE.MeshPhysicalMaterial; // Should be able to make this a generic material, but cannot
         
     private isHovered: boolean = false;

@@ -16,8 +16,9 @@ import {MousePointerComponent} from '../Components/MouseHandlingComponent/MouseP
 import {BasicGeometryComponent} from '../Components/BasicGeometryComponent';
 import {SelectableComponent} from '../Components/MouseHandlingComponent/SelectableComponent';
 import {WeighableComponent} from '../Components/ScaleComponents/WeighableComponent';
-import {HoverComponent} from '../Components/HoverComponent';
+import {HoverComponent} from '../Components/MouseHandlingComponent/HoverComponent';
 import {ColorChangerComponent} from '../Components/ColorChangerComponent';
+import { OutlineHoverComponent } from '../Components/OutlineHoverComponent';
 
 export default class BasicTestScene extends BaseScene
 {
@@ -32,8 +33,6 @@ export default class BasicTestScene extends BaseScene
     scaleComponent!: ScaleWeightComponent;
 
     skybox!: THREE.Texture;
-
-    testMat!: THREE.MeshToonMaterial;
     colors: Array<THREE.Color> =
     [
         new THREE.Color(0xff0000),
@@ -41,17 +40,25 @@ export default class BasicTestScene extends BaseScene
         new THREE.Color(0x0000ff),
     ]
 
+    // Lights
+    ambientLight!: THREE.AmbientLight;
+    directionalLight!: THREE.DirectionalLight;
+    hemiLight!: THREE.HemisphereLight;
+
+    customOutlineMat!: THREE.ShaderMaterial;
+
     constructor()
     {        
         super();
         this.entityManager = new EntityManager();
-        this.testMat = new THREE.MeshToonMaterial();
     }
     
     async initialize(renderer: Renderer)
     {
         super.initialize(renderer);
         this.initializeBasicScene(renderer);
+
+        this.customOutlineMat = await this.createSphereMat();
 
         // Creating entities        
         this.createMouseHandlerEntity();
@@ -151,15 +158,13 @@ export default class BasicTestScene extends BaseScene
         }
 
         const sphere = new THREE.SphereGeometry(0.5, 16, 16);
-        const material = this.testMat;
-        material.color.set(new THREE.Color().setHSL(0.0, 1.0, 0.5));
 
         const sphereEntity = new Entity();        
 
         // Setup component
         const geometryComponent = new BasicGeometryComponent(params);
         geometryComponent.setGeometry(sphere);
-        geometryComponent.setMaterial(material);
+        geometryComponent.setMaterial(this.customOutlineMat);
         geometryComponent.createMesh();
 
         const selectComponent = new SelectableComponent(params);        
@@ -168,6 +173,10 @@ export default class BasicTestScene extends BaseScene
         const hoverComponent = new HoverComponent(params);        
         hoverComponent.setSelectableObject(geometryComponent.mesh);
 
+        const outlineComponent = new OutlineHoverComponent(params);
+        outlineComponent.setMaterialToUpdate(this.customOutlineMat);
+        outlineComponent.setOutlineColor(new THREE.Color(0.9, 0.3, 0.9));
+
         const weighableComponent = new WeighableComponent(params);
         weighableComponent.setScaleComponent(this.scaleComponent); // I know I'm making the scale first, so just save the component above intsead of going through entity manager
         weighableComponent.weight = 123.45;
@@ -175,6 +184,7 @@ export default class BasicTestScene extends BaseScene
         sphereEntity.addComponent(geometryComponent);
         sphereEntity.addComponent(selectComponent);
         sphereEntity.addComponent(hoverComponent);
+        sphereEntity.addComponent(outlineComponent);
         sphereEntity.addComponent(weighableComponent);
 
         sphereEntity.group.scale.set(0.25, 0.25, 0.25);
@@ -196,17 +206,17 @@ export default class BasicTestScene extends BaseScene
         this.orbit.target.set(0, 1, -2);
         this.orbit.update();
 
-        const ambientLight = new THREE.AmbientLight(0x808080, 0.4);
-        this.add(ambientLight);
+        this.ambientLight = new THREE.AmbientLight(0x808080, 0.4);
+        this.add(this.ambientLight);
 
 
-        const hemiLight = new THREE.HemisphereLight(0xB1E1FF, 0xB97A20, 0.5);
-        this.add(hemiLight);
+        this.hemiLight = new THREE.HemisphereLight(0xB1E1FF, 0xB97A20, 0.5);
+        this.add(this.hemiLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xCCCCCC, 0.5);
-        directionalLight.position.set(-3.0, 4.0, 1.0);        
-        directionalLight.castShadow = true;
-        this.add(directionalLight);
+        this.directionalLight = new THREE.DirectionalLight(0xCCCCCC, 0.5);
+        this.directionalLight.position.set(-3.0, 4.0, 1.0);        
+        this.directionalLight.castShadow = true;
+        this.add(this.directionalLight);
 
         const skyboxLoader = new THREE.CubeTextureLoader();
         this.skybox = skyboxLoader.load([
@@ -269,15 +279,27 @@ export default class BasicTestScene extends BaseScene
         return physMat;        
     }
 
-    createToonMat()
+    // Custom shader for the sphere
+    async createSphereMat()
     {
-        const toonMat = new THREE.MeshToonMaterial(
-            {
-                color: 0x52A9B1,
-            }
-        )
+        const vsh = await fetch('./resources/shaders/vertex-outline.glsl');
+        const fsh = await fetch('./resources/shaders/fragment-outline.glsl');
 
-        return toonMat;       
+        const customMaterial = new THREE.ShaderMaterial({
+            uniforms:
+            {
+                uSelected: {value : false},
+                uOutlineColor: { value: new THREE.Vector3(0.6, 0.2, 0.2)},
+                uBaseColor: { value: new THREE.Vector3(0.3, 0.3, 0.3)},
+                uAmbient: { value: this.ambientLight.color},
+                uDiffuseDir: { value: this.directionalLight.position.sub(this.directionalLight.target.position)},
+                uDiffuseColor: {value: this.directionalLight.color},
+            },
+            vertexShader: await vsh.text(),
+            fragmentShader: await fsh.text(),
+        });
+
+        return customMaterial;
     }
 
     update(delta: number)

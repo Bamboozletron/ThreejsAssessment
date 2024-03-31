@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import {Component} from '../EntityComponent/Component';
-import { MousePointerComponent } from './MouseHandlingComponent/MousePointerComponent'
+import {Component} from '../../EntityComponent/Component';
+import { MousePointerComponent } from './MousePointerComponent'
 
-import * as ThreeHelpers from '../Util/ThreeHelpers';
+import * as ThreeHelpers from '../../Util/ThreeHelpers';
 
 export class HoverComponent extends Component
 {
