@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { inverseLerp } from 'three/src/math/MathUtils';
 
 export async function createCustomMaterial(vshPath: string, fshPath: string):  Promise<THREE.ShaderMaterial>
 {
@@ -62,4 +63,10 @@ export async function LoadGLTF(modelPath: string)
 {
     const loader = new GLTFLoader();
     return loader.loadAsync(modelPath);
+}
+
+export function Remap(value: number, inMin: number, inMax: number, outMin: number, outMax: number)
+{    
+    const t = THREE.MathUtils.inverseLerp(inMin, inMax, value);
+    return THREE.MathUtils.lerp(outMin, outMax, t);
 }

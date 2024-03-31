@@ -15,8 +15,9 @@ import {ScaleWeightComponent} from '../Components/ScaleComponents/ScaleWeightCom
 import {MousePointerComponent} from '../Components/MouseHandlingComponent/MousePointerComponent';
 import {BasicGeometryComponent} from '../Components/BasicGeometryComponent';
 import {SelectableComponent} from '../Components/MouseHandlingComponent/SelectableComponent';
-import { WeighableComponent } from '../Components/ScaleComponents/WeighableComponent';
-
+import {WeighableComponent} from '../Components/ScaleComponents/WeighableComponent';
+import {HoverComponent} from '../Components/HoverComponent';
+import {ColorChangerComponent} from '../Components/ColorChangerComponent';
 
 export default class BasicTestScene extends BaseScene
 {
@@ -30,10 +31,21 @@ export default class BasicTestScene extends BaseScene
     scaleGroup!: THREE.Group;
     scaleComponent!: ScaleWeightComponent;
 
+    skybox!: THREE.Texture;
+
+    testMat!: THREE.MeshToonMaterial;
+    colors: Array<THREE.Color> =
+    [
+        new THREE.Color(0xff0000),
+        new THREE.Color(0x00ff00),
+        new THREE.Color(0x0000ff),
+    ]
+
     constructor()
     {        
         super();
         this.entityManager = new EntityManager();
+        this.testMat = new THREE.MeshToonMaterial();
     }
     
     async initialize(renderer: Renderer)
@@ -46,13 +58,9 @@ export default class BasicTestScene extends BaseScene
         this.createScaleEntity();
 
         this.createWeightedCube();
+        this.createWeightedSphere();
 
         this.setupTable();
-
-        // Wait for all the loading of models
-        // await Promise.all([
-        //     this.setupTable(),
-        // ])
     }
 
     createMouseHandlerEntity()
@@ -98,11 +106,7 @@ export default class BasicTestScene extends BaseScene
         }
 
         const box = new THREE.BoxGeometry();
-        const material = new THREE.MeshPhongMaterial(
-            {
-                color: 0x00A2B4,
-            }
-        );
+        const material = this.createCubeMat();
 
         const cubeEntity = new Entity();        
 
@@ -115,19 +119,70 @@ export default class BasicTestScene extends BaseScene
         const selectComponent = new SelectableComponent(params);        
         selectComponent.setSelectableObject(geometryComponent.mesh);
 
+        const hoverComponent = new HoverComponent(params);        
+        hoverComponent.setSelectableObject(geometryComponent.mesh);
+
+        const colorChanger = new ColorChangerComponent(params);
+        colorChanger.setMaterialToUpdate(material);
+
         const weighableComponent = new WeighableComponent(params);
         weighableComponent.setScaleComponent(this.scaleComponent); // I know I'm making the scale first, so just save the component above intsead of going through entity manager
+        weighableComponent.weight = 567.89;
 
         cubeEntity.addComponent(geometryComponent);
         cubeEntity.addComponent(selectComponent);
+        cubeEntity.addComponent(hoverComponent);
+        cubeEntity.addComponent(colorChanger);
         cubeEntity.addComponent(weighableComponent);
 
         cubeEntity.group.scale.set(0.25, 0.25, 0.25);
-        cubeEntity.group.position.set(-0.45, 1.15, 0.0);
+        cubeEntity.group.position.set(0.00, 1.15, 0.0);
 
         this.entityManager.addEntity(cubeEntity, "WeightedCube");    
         
         this.add(cubeEntity.group);
+    }
+
+    // Could probably collapse sphere/cube, but not 100% sure I want to yet
+    createWeightedSphere()
+    {
+        const params = {
+            scene: this,
+        }
+
+        const sphere = new THREE.SphereGeometry(0.5, 16, 16);
+        const material = this.testMat;
+        material.color.set(new THREE.Color().setHSL(0.0, 1.0, 0.5));
+
+        const sphereEntity = new Entity();        
+
+        // Setup component
+        const geometryComponent = new BasicGeometryComponent(params);
+        geometryComponent.setGeometry(sphere);
+        geometryComponent.setMaterial(material);
+        geometryComponent.createMesh();
+
+        const selectComponent = new SelectableComponent(params);        
+        selectComponent.setSelectableObject(geometryComponent.mesh);
+
+        const hoverComponent = new HoverComponent(params);        
+        hoverComponent.setSelectableObject(geometryComponent.mesh);
+
+        const weighableComponent = new WeighableComponent(params);
+        weighableComponent.setScaleComponent(this.scaleComponent); // I know I'm making the scale first, so just save the component above intsead of going through entity manager
+        weighableComponent.weight = 123.45;
+
+        sphereEntity.addComponent(geometryComponent);
+        sphereEntity.addComponent(selectComponent);
+        sphereEntity.addComponent(hoverComponent);
+        sphereEntity.addComponent(weighableComponent);
+
+        sphereEntity.group.scale.set(0.25, 0.25, 0.25);
+        sphereEntity.group.position.set(-0.5, 1.2, 0.0);
+
+        this.entityManager.addEntity(sphereEntity, "WeightedSphere");    
+        
+        this.add(sphereEntity.group);
     }
 
     // Camera/controls/skybox setup.  Could also be it's own entity now
@@ -141,16 +196,20 @@ export default class BasicTestScene extends BaseScene
         this.orbit.target.set(0, 1, -2);
         this.orbit.update();
 
-        const ambientLight = new THREE.AmbientLight(0x808080);
+        const ambientLight = new THREE.AmbientLight(0x808080, 0.4);
         this.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xAAAAAA);
+
+        const hemiLight = new THREE.HemisphereLight(0xB1E1FF, 0xB97A20, 0.5);
+        this.add(hemiLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xCCCCCC, 0.5);
         directionalLight.position.set(-3.0, 4.0, 1.0);        
         directionalLight.castShadow = true;
         this.add(directionalLight);
 
         const skyboxLoader = new THREE.CubeTextureLoader();
-        const texture = skyboxLoader.load([
+        this.skybox = skyboxLoader.load([
             './resources/skybox/Cold_Sunset__Cam_2_Left+X.png',
             './resources/skybox/Cold_Sunset__Cam_3_Right-X.png',
             './resources/skybox/Cold_Sunset__Cam_4_Up+Y.png',
@@ -158,7 +217,7 @@ export default class BasicTestScene extends BaseScene
             './resources/skybox/Cold_Sunset__Cam_0_Front+Z.png',
             './resources/skybox/Cold_Sunset__Cam_1_Back-Z.png',
         ]);
-        this.background = texture;
+        this.background = this.skybox;
     }
 
     // Ideally table would be split out into it's own entity now, postponing that to get the actual stuff done though
@@ -187,9 +246,45 @@ export default class BasicTestScene extends BaseScene
         }
     }
 
+    createCubeMat()
+    {
+        const physMat = new THREE.MeshPhysicalMaterial(
+            {
+                color: 0x80d1fd,
+                transparent: true,
+                opacity: 0.35,
+                side: THREE.DoubleSide,
+                depthWrite: false,
+                roughness: 0.275,
+                metalness: 0.165,
+                ior: 1.7,
+                reflectivity: 0.6,
+                iridescence: 1,
+                iridescenceIOR: 1.3,
+                sheen: 0.6,
+                envMap: this.skybox
+            }
+        )
+
+        return physMat;        
+    }
+
+    createToonMat()
+    {
+        const toonMat = new THREE.MeshToonMaterial(
+            {
+                color: 0x52A9B1,
+            }
+        )
+
+        return toonMat;       
+    }
+
     update(delta: number)
     {
         this.timeElapsed += delta;        
         this.entityManager.updateEntities(delta);
     }
+    
+    
 }

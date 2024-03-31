@@ -35,7 +35,7 @@ export class SelectableComponent extends Component
         {
             this.entity?.broadcastEvent(
                 {
-                    eventName: "entitySelected",         
+                    eventName: "entitySelected",
                 }
             )
         }

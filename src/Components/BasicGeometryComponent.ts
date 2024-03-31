@@ -28,7 +28,7 @@ export class BasicGeometryComponent extends Component
 
     setMaterial(material: THREE.Material)
     {
-        this.mat = material;
+        this.mat = material;        
     }
 
     createMesh()

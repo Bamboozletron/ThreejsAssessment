@@ -39,9 +39,12 @@ export class MousePointerComponent extends Component
 
     getFirstIntersection(): THREE.Object3D | null
     {
-        if (this.intersections.length > 0)
+        if (this.intersections)
         {
-            return (<THREE.Object3D>this.intersections[0].object);
+            if (this.intersections.length > 0)
+            {
+                return (<THREE.Object3D>this.intersections[0].object);
+            }
         }
         
         return null;

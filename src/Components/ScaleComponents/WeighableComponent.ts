@@ -17,6 +17,8 @@ export class WeighableComponent extends Component
 
     scaleWeightComponent!: ScaleWeightComponent;
 
+    lerpTime: number = 1.0;
+
     constructor(params: any)
     {
         super();
@@ -33,22 +35,22 @@ export class WeighableComponent extends Component
             this.originalRot = this.entity.group.rotation.clone();
         }
 
-        this.tempScaleGroup.position.set(0,0.120,0);
+        this.tempScaleGroup.position.set(0,0.105,0);
         this.scaleWeightComponent.entity?.group.add(this.tempScaleGroup);        
     }
 
     onSelect(eventData: any)
     {
-        if (!this.isOnScale)
+        if(this.isOnScale)
+        {   
+            this.removeFromScale(); 
+            this.isOnScale = false;        
+        }
+        else if (!this.scaleWeightComponent.occupied)        
         {            
             this.placeOnScale();
             this.isOnScale = true;
-        }
-        else
-        {   
-            this.removeFromScale(); 
-            this.isOnScale = false;
-        }
+        }        
     }
 
     setScaleComponent(swc: ScaleWeightComponent)
@@ -68,6 +70,7 @@ export class WeighableComponent extends Component
         this.entity!.group.position.set(0, (box.max.y - box.min.y)/2, 0);
 
 
+        this.scaleWeightComponent.occupied = true;
         this.scaleWeightComponent.changeScaleWeight(this.weight);
     }
 
@@ -80,7 +83,12 @@ export class WeighableComponent extends Component
         this.entity!.group.rotation.set(this.originalRot.x, this.originalRot.y, this.originalRot.z);
         this.entity!.group.scale.set(this.originalScale.x, this.originalScale.y, this.originalScale.z);
 
+        this.scaleWeightComponent.occupied = false;
         this.scaleWeightComponent.changeScaleWeight(0.0);
+    }
+
+    update(delta: number): void {
+        
     }
 
 }

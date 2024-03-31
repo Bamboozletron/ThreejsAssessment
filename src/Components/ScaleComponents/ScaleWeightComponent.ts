@@ -14,12 +14,14 @@ export class ScaleWeightComponent extends Component
         private beginningWeight: number = 0;
         private targetWeight: number = 0;
     
-        private readonly timeToChange: number = 2.0;
+        private readonly timeToChange: number = 1.0;
         private timeProgress: number = 0;
     
         private scaleDigitsToShow: number = 9;
 
         private visualComponent!: ScaleVisualComponent | null; 
+
+        occupied: boolean = false;
 
         constructor(params: any)
         {
