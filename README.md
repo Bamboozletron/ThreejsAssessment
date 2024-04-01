@@ -35,6 +35,7 @@ When something is placed on the scale, it will take the current scale value and 
 
 ## Bonus
 Custom shader for basic phong reflection shading with an additional outline based on fresnel at [fragment-outline.glsl](https://github.com/Bamboozletron/ThreejsAssessment/blob/main/resources/shaders/fragment-outline.glsl).  Outline is triggered by hovering.
+Outline shader mostly taken from some previous testing I was doing which can be found at https://github.com/Bamboozletron/threejsTesting.
 
 No attempt at loading display
 
